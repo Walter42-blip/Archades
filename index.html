@@ -793,11 +793,13 @@ function init(){
   updateAll();
 }
 
-function selectSpecies(key){selectedSpecies=key;const sp=SPECIES[key];if(!sp.secondaryChoices.includes(selectedSecondary))selectedSecondary=null;renderSecondaryAbilityChoice();renderFeats();updateAll()}
+function featMatches(id){const f=FEATS.find(x=>x.id===id);if(!f)return false;const cm=f.matchClasses||[];const sm=f.matchSpecies||[];return(selectedClass&&cm.includes(selectedClass))||(selectedSpecies&&sm.includes(selectedSpecies))}
+function selectSpecies(key){selectedSpecies=key;const sp=SPECIES[key];if(!sp.secondaryChoices.includes(selectedSecondary))selectedSecondary=null;selectedFeats=selectedFeats.filter(id=>featMatches(id));renderSecondaryAbilityChoice();renderFeats();updateAll()}
 function selectSecondaryAbility(v){const sp=selectedSpecies?SPECIES[selectedSpecies]:null;selectedSecondary=sp&&sp.secondaryChoices.includes(v)?v:null;updateAll()}
 function selectClass(key){selectedClass=key;const cl=CLASSES[key];let i=`<strong>${cl.name}</strong> — ${cl.role}, ${cl.source} | Key: ${ABILITY_FULL[cl.keyAbility].toUpperCase()}<br>HP at 1st: ${cl.hpBase} + CON score | Surges: ${cl.surges} + CON mod<br>Defenses: Fort +${cl.defenses.fort}, Ref +${cl.defenses.ref}, Will +${cl.defenses.will}<br>Armor: ${cl.armor.join(', ')}<br>Weapons: ${cl.weapons.join(', ')}<br>Linked Deity: ${cl.deity}<br>Trained Skills: ${cl.trainedSkills.join(', ')} (pick 3)<br><strong>Features:</strong><ul class="feature-list">`;cl.features.forEach(f=>{i+=`<li><span class="fname">${f.name}</span><span class="fdesc">— ${f.desc}</span></li>`});i+='</ul>';document.getElementById("classInfo").innerHTML=i;
   const dm={heartsworn:"Astridhe (Star-Mother)",soulkeeper:"Dyhas (Souls)",oathbound:"Onos (Oaths & Thresholds)",warsinger:"Mithar (War, Dead)",trickweaver:"Pheksus (Trickster)",balancejudge:"Phiznir (Justice & Mercy)",sparkwright:"Uzotol (Creative Invention)",consecrator:"Ugyn (Questions & Consequences)",brightone:"Twin Bright Ones"};
   if(dm[key])document.getElementById("deitySelect").value=dm[key];
+  selectedFeats=selectedFeats.filter(id=>featMatches(id));
   renderFeats();renderSkills();selectedPowers={atwill:[],encounter:null,utility:null,daily:null};renderPowers();updateAll()}
 
 function setAbility(ab,val){abilityScores[ab]=parseInt(val)||10;updateAll()}
@@ -833,8 +835,24 @@ function updateDerived(){
 }
 
 function renderFeats(){
-  const fl=document.getElementById("featList");let h='';
-  FEATS.forEach(f=>{const cm=f.matchClasses||[];const sm=f.matchSpecies||[];let ml='';if(selectedClass||selectedSpecies){let r=[];if(selectedClass&&cm.includes(selectedClass))r.push(CLASSES[selectedClass].name);if(selectedSpecies&&sm.includes(selectedSpecies))r.push(SPECIES[selectedSpecies].name);ml=r.length?`<div class="fmatch">Matches: ${r.join(', ')}</div>`:`<div class="fmatch" style="color:#666">No match</div>`}let sel=selectedFeats.includes(f.id)?' selected':'';h+=`<div class="feat-card${sel}" onclick="selectFeat('${f.id}')"><div class="ftitle">${f.name}</div><div class="fprereq">${f.tier} ${f.origin} — ${f.prereq}</div><div class="fdesc">${f.desc}</div>${ml}</div>`});fl.innerHTML=h}
+  const fl=document.getElementById("featList");
+  if(!selectedClass&&!selectedSpecies){fl.innerHTML='<div style="color:#888">Select a species or class to see available feats.</div>';return}
+  let h='';
+  FEATS.forEach(f=>{
+    const cm=f.matchClasses||[];
+    const sm=f.matchSpecies||[];
+    const classMatch=selectedClass&&cm.includes(selectedClass);
+    const speciesMatch=selectedSpecies&&sm.includes(selectedSpecies);
+    if(!classMatch&&!speciesMatch)return;
+    let r=[];
+    if(classMatch)r.push(CLASSES[selectedClass].name);
+    if(speciesMatch)r.push(SPECIES[selectedSpecies].name);
+    const ml=r.length?`<div class="fmatch">Matches: ${r.join(', ')}</div>`:'';
+    let sel=selectedFeats.includes(f.id)?' selected':'';
+    h+=`<div class="feat-card${sel}" onclick="selectFeat('${f.id}')"><div class="ftitle">${f.name}</div><div class="fprereq">${f.tier} ${f.origin} — ${f.prereq}</div><div class="fdesc">${f.desc}</div>${ml}</div>`
+  });
+  fl.innerHTML=h||'<div style="color:#888">No feats match your current species/class.</div>'
+}
 
 function selectFeat(id){if(selectedFeats.includes(id))selectedFeats=selectedFeats.filter(f=>f!==id);else if(selectedFeats.length<3)selectedFeats.push(id);renderFeats();updateSheet()}
 
