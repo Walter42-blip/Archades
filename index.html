@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archades Character Creator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+h1{text-align:center;padding:20px 0 10px;font-size:1.8em;color:#f0c040;letter-spacing:1px}
+h1 small{display:block;font-size:.5em;color:#888;letter-spacing:0;margin-top:4px}
+.container{max-width:1100px;margin:0 auto;padding:0 20px 40px}
+.step{background:#16213e;border:1px solid #2a2a4a;border-radius:8px;padding:20px;margin-bottom:16px}
+.step h2{font-size:1.1em;color:#f0c040;margin-bottom:12px;border-bottom:1px solid #2a2a4a;padding-bottom:8px}
+.row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.row label{font-weight:600;min-width:120px;color:#ccc}
+.row input,.row select{flex:1;min-width:200px;padding:8px 10px;background:#0f1729;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0;font-size:.95em}
+.row input:focus,.row select:focus{outline:none;border-color:#f0c040}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ability-box{text-align:center;background:#0f1729;border:1px solid #3a3a5a;border-radius:6px;padding:10px}
+.ability-box .name{font-size:.85em;color:#888;margin-bottom:4px}
+.ability-box .score{font-size:1.6em;font-weight:700;color:#f0c040}
+.ability-box .mod{font-size:.9em;color:#aaa}
+.ability-box input{width:60px;text-align:center;padding:6px;background:#0f1729;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0;font-size:1.1em;font-weight:700}
+.ability-box .racial{font-size:.75em;color:#6ec6ff;margin-top:4px}
+.pb-btns{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+.pb-btn{width:28px;height:28px;border:1px solid #3a3a5a;border-radius:4px;background:#0f1729;color:#e0e0e0;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pb-btn:hover{border-color:#f0c040;color:#f0c040}
+.pb-btn:disabled{opacity:.3;cursor:not-allowed;border-color:#3a3a5a;color:#666}
+.pb-cost{font-size:.7em;color:#888;margin-top:2px}
+.radio-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-group label{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#0f1729;border:1px solid #3a3a5a;border-radius:4px;cursor:pointer;font-weight:400;min-width:auto;transition:all .15s}
+.radio-group label:hover{border-color:#f0c040}
+.radio-group input[type=radio]{display:none}
+.radio-group input[type=radio]:checked+span{color:#f0c040;font-weight:700}
+.radio-group input[type=radio]:checked~span{color:#f0c040}
+.radio-group label:has(input:checked){border-color:#f0c040;background:#1a1a3e}
+.derived{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.derived-item{background:#0f1729;border:1px solid #3a3a5a;border-radius:6px;padding:10px;text-align:center}
+.derived-item .label{font-size:.75em;color:#888;text-transform:uppercase;letter-spacing:1px}
+.derived-item .value{font-size:1.4em;font-weight:700;color:#f0c040}
+.progress-note{font-size:.85em;color:#888;margin:0 0 10px}
+.progress-table{width:100%;border-collapse:collapse;font-size:.88em;overflow:hidden;border-radius:6px}
+.progress-table th,.progress-table td{border:1px solid #2a2a4a;padding:8px 10px;text-align:center;vertical-align:middle}
+.progress-table th{background:#0f1729;color:#f0c040;font-size:.75em;text-transform:uppercase;letter-spacing:.6px}
+.progress-table td{background:#16213e}
+.progress-table tr.level-4 td{background:#1a1a3e}
+.progress-table tr.level-4 td:first-child{font-weight:700;color:#f0c040}
+.feature-list{list-style:none;padding:0}
+.feature-list li{padding:6px 0;border-bottom:1px solid #1a1a3e;font-size:.9em}
+.feature-list li:last-child{border:none}
+.feature-list .fname{color:#f0c040;font-weight:600}
+.feature-list .fdesc{color:#aaa;margin-left:8px}
+.feat-card{background:#0f1729;border:1px solid #3a3a5a;border-radius:6px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.feat-card:hover{border-color:#6ec6ff}
+.feat-card.selected{border-color:#f0c040;background:#1a1a3e}
+.feat-card .ftitle{font-weight:700;color:#f0c040;font-size:.95em}
+.feat-card .fprereq{font-size:.8em;color:#888;margin-top:2px}
+.feat-card .fdesc{font-size:.85em;color:#ccc;margin-top:6px}
+.feat-card .fmatch{font-size:.75em;color:#6ec6ff;margin-top:4px}
+.power-card{background:#0f1729;border:1px solid #3a3a5a;border-radius:6px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.power-card:hover{border-color:#6ec6ff}
+.power-card.selected{border-color:#f0c040;background:#1a1a3e}
+.power-card .ptitle{font-weight:700;color:#f0c040;font-size:.95em}
+.power-card .pkeywords{color:#6ec6ff;font-size:.8em}
+.power-card .pdesc{font-size:.85em;color:#ccc;margin-top:6px}
+.power-card .pmeta{font-size:.85em;color:#aaa;margin-top:4px}
+.power-section{color:#f0c040;font-size:.95em;margin:12px 0 4px;font-weight:700}
+.skill-card{background:#0f1729;border:1px solid #3a3a5a;border-radius:4px;padding:8px 12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.skill-card:hover{border-color:#6ec6ff}
+.skill-card.selected{border-color:#f0c040;background:#1a1a3e}
+.skill-card .sname{font-weight:600;color:#e0e0e0}
+.skill-card .sabil{font-size:.8em;color:#888}
+.skill-count{font-size:.85em;color:#888;margin-bottom:8px}
+.btn{display:inline-block;padding:10px 24px;background:#f0c040;color:#1a1a2e;border:none;border-radius:6px;font-weight:700;font-size:1em;cursor:pointer;transition:all .15s;margin:0 4px}
+.btn:hover{background:#ffd060}
+.btn-secondary{background:#3a3a5a;color:#e0e0e0}
+.btn-secondary:hover{background:#4a4a6a}
+.actions{text-align:center;margin:20px 0}
+#sheet{display:none}
+/* Screen preview mode */
+body.sheet-preview #creator{display:none}
+body.sheet-preview #sheet{display:block;background:#fff;color:#2d1b4e;padding:20px}
+body.sheet-preview .actions{display:none!important}
+body.sheet-preview .sheet-close{display:inline-block!important}
+.sheet-close{display:none}
+/* Print sheet styles (always applied to #sheet) */
+#sheet .sheet-page{width:7.5in;margin:0 auto;font-family:Arial,sans-serif;font-size:10px;color:#2d1b4e}
+#sheet .sheet-banner{display:flex;justify-content:space-between;align-items:end;border-bottom:2px solid #2d1b4e;padding-bottom:4px;margin-bottom:8px}
+#sheet .sheet-banner-title{font-size:20px;font-weight:bold;font-family:Georgia,serif}
+#sheet .sheet-banner-subtitle{font-size:18px;font-weight:bold;letter-spacing:2px}
+#sheet .sheet-hrow{display:flex;gap:8px;margin-bottom:8px;align-items:end;flex-wrap:wrap}
+#sheet .sheet-field{display:flex;flex-direction:column;flex:1}
+#sheet .sheet-field-label{font-size:8px;text-transform:uppercase;font-weight:bold;color:#8b5cf6;letter-spacing:.5px}
+#sheet .sheet-field-value{font-weight:bold;font-size:11px;border-bottom:1px solid #2d1b4e;min-height:16px;display:flex;align-items:end;padding-bottom:1px}
+#sheet .sheet-statbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+#sheet .sheet-statbox{border:1px solid #2d1b4e;padding:4px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#sheet .sheet-statbox .sv{font-size:12px;font-weight:bold;color:#2d1b4e}
+#sheet .sheet-statbox .sl{font-size:7px;text-transform:uppercase;font-weight:bold;color:#8b5cf6;letter-spacing:.5px}
+#sheet .sheet-3col{display:grid;grid-template-columns:2.5fr 1.5fr 2fr;gap:8px}
+#sheet .sheet-box{border:1px solid #2d1b4e;margin-bottom:8px}
+#sheet .sheet-secthdr{background:#2d1b4e;color:#fff;font-size:10px;font-weight:bold;text-transform:uppercase;text-align:center;padding:3px;border-bottom:2px solid #4ade80}
+#sheet .sheet-hp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px}
+#sheet .sheet-hp-item{text-align:center}
+#sheet .sheet-hp-item .hv{font-size:12px;font-weight:bold;color:#2d1b4e}
+#sheet .sheet-hp-item .hl{font-size:7px;text-transform:uppercase;font-weight:bold;color:#8b5cf6}
+#sheet .sheet-hp-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 8px 8px;font-size:9px}
+#sheet .sheet-hp-row>div{border:1px solid #2d1b4e;padding:4px}
+#sheet .sheet-hp-row .hl{font-size:7px;text-transform:uppercase;font-weight:bold;color:#8b5cf6}
+#sheet .sheet-hp-row .hv{font-size:12px;font-weight:bold}
+#sheet .sheet-abil-row{display:flex;align-items:center;gap:8px;padding:4px 8px;font-size:10px}
+#sheet .sheet-abil-box{width:32px;height:28px;border:1px solid #2d1b4e;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
+#sheet .sheet-abil-name{font-weight:bold;width:32px;text-align:center;font-size:10px}
+#sheet .sheet-def-list{display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:8px}
+#sheet .sheet-def-item{text-align:center;margin-bottom:4px}
+#sheet .sheet-def-circle{width:36px;height:36px;border-radius:50%;border:2px solid #2d1b4e;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;margin:0 auto}
+#sheet .sheet-def-name{font-size:8px;font-weight:bold;text-transform:uppercase;margin-top:2px}
+#sheet .sheet-def-src{font-size:6px;text-transform:uppercase;color:#8b5cf6}
+#sheet .sheet-feat-list{padding:8px;font-size:9px;line-height:1.4}
+#sheet .sheet-feat-list .sfn{font-weight:bold}
+#sheet .sheet-skills-table{width:100%;border-collapse:collapse;font-size:9px}
+#sheet .sheet-skills-table th{font-size:7px;text-transform:uppercase;font-weight:bold;color:#8b5cf6;border-bottom:1px solid #2d1b4e;padding:2px;text-align:left}
+#sheet .sheet-skills-table td{padding:1px 2px;border-bottom:1px solid #2d1b4e11}
+#sheet .sheet-skills-table .sk-bonus{font-weight:bold;width:30px;text-align:center}
+#sheet .sheet-skills-table .sk-name{font-size:9px}
+#sheet .sheet-skills-table .sk-abil{text-align:center;color:#8b5cf6;width:30px;font-size:8px}
+#sheet .sheet-skills-table .sk-trained{background:#2d1b4e08}
+#sheet .sheet-portrait{height:120px;display:flex;align-items:center;justify-content:center;color:#2d1b4e30;font-size:10px;border:1px solid #2d1b4e;margin-bottom:8px}
+#sheet .sheet-power-list{padding:8px;font-size:9px}
+#sheet .sheet-power-list .spl{font-weight:bold;display:flex;align-items:start;gap:4px;margin-bottom:2px}
+#sheet .sheet-power-list .spl::before{content:"\2610";font-size:10px}
+#sheet .sheet-langs{padding:8px;font-size:9px}
+#sheet .sheet-features-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+#sheet .sheet-page-break{page-break-before:always}
+#sheet .sheet-pwr-card{border:1px solid #2d1b4e;margin-bottom:8px;overflow:hidden}
+#sheet .sheet-pwr-hdr{color:#fff;padding:4px 8px;display:flex;justify-content:space-between;align-items:center}
+#sheet .sheet-pwr-hdr .sheet-pwr-name{font-weight:bold;font-size:11px}
+#sheet .sheet-pwr-hdr .sheet-pwr-meta{font-size:9px}
+#sheet .sheet-pwr-body{padding:8px;font-size:9px;line-height:1.5}
+#sheet .sheet-pwr-body b{color:#2d1b4e}
+#sheet .sheet-pwr-atwill{background:#4a7c3f}
+#sheet .sheet-pwr-encounter{background:#8b1a1a}
+#sheet .sheet-pwr-daily{background:#2d2d2d}
+#sheet .sheet-pwr-utility{background:#2a5090}
+#sheet .sheet-empty{color:#2d1b4e40;padding:8px;font-size:9px}
+@media print{
+@page{margin:.3in;size:letter portrait}
+body{background:#fff!important}
+#creator,.actions{display:none!important}
+#sheet{display:block!important}
+body.sheet-preview #sheet{display:block!important}
+.sheet-close{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Archades Character Creator<small>D&D 4th Edition — The Oath's Choice</small></h1>
+
+<div id="creator">
+<div class="step">
+<h2>1. Identity</h2>
+<div class="row"><label>Character Name</label><input id="charName" placeholder="Enter name" oninput="updateSheet()"></div>
+<div class="row"><label>Player Name</label><input id="playerName" placeholder="Enter name" oninput="updateSheet()"></div>
+</div>
+
+<div class="step">
+<h2>2. Species</h2>
+<div class="radio-group" id="speciesGroup"></div>
+<div id="speciesInfo" style="margin-top:12px;font-size:.9em;color:#aaa"></div>
+<div class="row" id="secondaryAbilityRow" style="display:none;margin-top:12px"><label>Secondary Ability</label><select id="secondaryAbilitySelect" onchange="selectSecondaryAbility(this.value)"></select></div>
+</div>
+
+<div class="step">
+<h2>3. Class</h2>
+<div class="radio-group" id="classGroup"></div>
+<div id="classInfo" style="margin-top:12px;font-size:.9em;color:#aaa"></div>
+</div>
+
+<div class="step">
+<h2>4. Ability Scores</h2>
+<div class="row" style="margin-bottom:12px">
+<label style="min-width:auto">Method:</label>
+<label style="min-width:auto;cursor:pointer"><input type="radio" name="scoreMethod" value="array" checked onchange="switchScoreMethod('array')"> Standard Array</label>
+<label style="min-width:auto;cursor:pointer"><input type="radio" name="scoreMethod" value="pointbuy" onchange="switchScoreMethod('pointbuy')"> 28-Point Buy</label>
+</div>
+<div id="arrayNote" style="font-size:.85em;color:#888;margin-bottom:12px">Standard array: 16, 14, 13, 12, 11, 10. Assign to abilities below. Racial modifiers applied automatically.</div>
+<div id="pointbuyNote" style="font-size:.85em;color:#888;margin-bottom:12px;display:none">28 points to spend. Scores 8-18 before racial. Cost increases at higher scores. <span id="pointsRemaining" style="color:#f0c040;font-weight:700"></span></div>
+<div class="grid3" id="abilityGrid"></div>
+</div>
+
+<div class="step">
+<h2>5. Skills <small style="color:#888;font-weight:400">(Pick 3 trained skills)</small></h2>
+<div id="skillList"></div>
+</div>
+
+<div class="step">
+<h2>6. Derived Stats</h2>
+<div class="derived" id="derivedGrid"></div>
+</div>
+
+<div class="step">
+<h2>7. Level Progression <small style="color:#888;font-weight:400">(Levels 1-10)</small></h2>
+<div id="levelProgression"></div>
+</div>
+
+<div class="step">
+<h2>8. Feats <small style="color:#888;font-weight:400">(Pick up to 3 by level 4)</small></h2>
+<div id="featList"></div>
+</div>
+
+<div class="step">
+<h2>9. Powers <small style="color:#888;font-weight:400">(Select 2 at-wills, 1 encounter, 1 utility, 1 daily)</small></h2>
+<div id="powerList"></div>
+</div>
+
+<div class="step">
+<h2>10. Details</h2>
+<div class="row"><label>Deity</label><select id="deitySelect" onchange="updateSheet()"></select></div>
+<div class="row"><label>Alignment</label><select id="alignSelect" onchange="updateSheet()"><option>Good</option><option>Lawful Good</option><option>Unaligned</option><option>Lawful Neutral</option><option>Chaotic Neutral</option><option>Evil</option><option>Chaotic Evil</option></select></div>
+<div class="row"><label>Gender</label><input id="gender" placeholder="Optional" oninput="updateSheet()"></div>
+<div class="row"><label>Height</label><input id="height" placeholder="Optional" oninput="updateSheet()"></div>
+<div class="row"><label>Weight</label><input id="weight" placeholder="Optional" oninput="updateSheet()"></div>
+</div>
+
+<div class="actions">
+<button class="btn" onclick="printSheet()">Print Character Sheet</button>
+<button class="btn btn-secondary" onclick="viewSheet()">View Sheet</button>
+<button class="btn btn-secondary" onclick="exportJSON()">Export JSON</button>
+<button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+<button class="btn btn-secondary" onclick="resetAll()">Reset</button>
+</div>
+</div>
+
+<div id="sheet"></div>
+
+<div class="actions" style="display:none" id="sheetActions">
+<button class="btn sheet-close" onclick="closeSheet()">Back to Creator</button>
+<button class="btn" onclick="window.print()">Print</button>
+</div>
+</div>
+
+<script>
+// DATA: Species (unchanged)
+const SPECIES = {
+  dorvax: {
+    name: "Dorvax — Deep-Beetle Kin",
+    primaryAbility: "con", secondaryChoices: ["str", "wis"],
+    speed: 6, specialSpeed: "burrow 2",
+    languages: ["Common", "Dorvax Chitin-Click"],
+    proficiencies: ["Simple melee", "Simple ranged", "Shields", "Artisan's tools (tinker's)"],
+    features: [
+      { name: "Carapace Shell", desc: "Natural armor AC 13 + Dex mod; cannot wear manufactured armor; can carry shield." },
+      { name: "Subterranean Sense", desc: "Burrow 2; +2 Perception vs ground vibrations; detect large tunnels within 12 sq." },
+      { name: "Pressure Resilience", desc: "Resist 5 bludgeoning (falling/crushing); scales at 11th/21st. Min damage from falling." },
+      { name: "Hive-Echo Thought", desc: "+2 Will vs fear in confined/underground spaces; +2 Intimidate in tunnels." }
+    ]
+  },
+  glassbound: {
+    name: "Glassbound — Crystal-Forged",
+    primaryAbility: "con", secondaryChoices: ["cha", "int"],
+    speed: 6, languages: ["Common", "Glassbound Resonance"],
+    proficiencies: ["Simple melee", "Simple ranged", "Shields", "Artisan's tools (glassblower's)"],
+    features: [
+      { name: "Crystalline Body", desc: "Natural armor AC 13 + Dex mod; cannot wear manufactured armor; can carry shield." },
+      { name: "Bound Essence", desc: "When reduced to 0 HP, Con save DC 10+1/2lvl once/day to drop to 1 HP instead." },
+      { name: "Resonant Voice", desc: "+2 Diplomacy when heard; voice carries in muffled environments." },
+      { name: "Light Refraction", desc: "After hit by radiant/light damage, resist 5 to that type until end of next turn (scales)." }
+    ]
+  },
+  harun: {
+    name: "Harun — Ember-Changed",
+    primaryAbility: "cha", secondaryChoices: ["str", "dex"],
+    speed: 6, languages: ["Common", "Harun Ember-Speech"],
+    proficiencies: ["Simple melee", "Military melee (heavy blade)", "Cloth armor", "Leather armor", "Artisan's tools (smith's)"],
+    features: [
+      { name: "Inner Fire", desc: "Resist 5 fire (scales); when hit by fire, +1 to next attack before end of next turn." },
+      { name: "Ember Surge", desc: "1/encounter, minor: enemies within 2 sq take fire dmg = CHA mod (min 1); +2 next Intimidate." },
+      { name: "Heat-Warded", desc: "+2 saves vs heat hazards; no penalty on Endurance in hot environments." },
+      { name: "Transformed Resilience", desc: "+1 Fortitude." }
+    ]
+  },
+  keshari: {
+    name: "Keshari — Sand-Wrought",
+    primaryAbility: "wis", secondaryChoices: ["con", "str"],
+    speed: 6, languages: ["Common", "Keshari Stone-Whisper"],
+    proficiencies: ["Simple melee", "Simple ranged", "Military melee (hammer, mace)", "Light armor", "Shields", "Artisan's tools (mason's)"],
+    features: [
+      { name: "Desert Strider", desc: "Not slowed by sand/dust/gravel difficult terrain; +2 Athletics to avoid sinking there." },
+      { name: "Grain-Body", desc: "Resist 5 piercing (scales); no need to eat/drink but must absorb mineral dust monthly or -2 WIS." },
+      { name: "Heart-Stone", desc: "1/day, minor: gain temp HP = level + CON mod until end of encounter." },
+      { name: "Still Mind", desc: "+2 saves vs frightened and charmed; +2 Insight to detect deception." }
+    ]
+  },
+  marai: {
+    name: "Marai — Tidewalkers",
+    primaryAbility: "wis", secondaryChoices: ["cha", "dex"],
+    speed: 6, specialSpeed: "swim 6",
+    languages: ["Common", "Marai Tide-Song"],
+    proficiencies: ["Simple weapons", "All tridents", "Light armor", "Navigator's tools"],
+    features: [
+      { name: "Amphibious", desc: "Breathe air and water; underwater movement unhindered; hold breath indefinitely underwater." },
+      { name: "Tide-Song", desc: "1/short rest: allies within 3 sq gain temp HP = prof bonus + CHA mod, or end frightened early on one." },
+      { name: "Brine-Adapted", desc: "Resist 5 cold (scales); when taking cold damage, +1 to next damage roll." },
+      { name: "Echo of the Deep", desc: "+2 Perception to hear underwater; sense direction/distance of sound source in water." }
+    ]
+  },
+  enduring: {
+    name: "Enduring — Living Construct",
+    primaryAbility: "con", secondaryChoices: ["int", "wis"],
+    speed: 6, languages: ["Common", "Deep Speech"],
+    proficiencies: ["Simple melee", "Simple ranged", "Light armor", "Artisan's tools (coffin-maintenance)"],
+    features: [
+      { name: "Coffin Body", desc: "Living Construct. Immune to disease. No need to eat, drink, or breathe. No sleep, but 4-hour maintenance cycle (-2 Perception during)." },
+      { name: "Neural Resilience", desc: "+2 saves vs dazed, dominated, and stunned." },
+      { name: "Neural Resonance", desc: "Send/receive simple neural signals to other Enduring within 1 mile (5 miles through water). Carries concepts, warnings, emotions — not complex language." },
+      { name: "Adaptation", desc: "Choose one at character creation: Reinforced Plating (+2 Endurance, +1 Fort), Enhanced Sensors (+2 Perception), Additional Limbs (+2 Thievery, extra object interaction), or Environmental Sealing (+2 Nature, resist 5 to one energy type)." },
+      { name: "Coffin's Response", desc: "Immediate Reaction when hit: shift 1 sq, resist 5 to that damage type until end of next turn (resist 10 vs psychic; shift 2 vs psychic). Scales at 11th/21st." }
+    ]
+  },
+  shayln: {
+    name: "Shayln — Wind-Borne",
+    primaryAbility: "dex", secondaryChoices: ["cha", "wis"],
+    speed: 6, specialSpeed: "fly 2 (glide)",
+    languages: ["Common", "Shayln Wind-Speech"],
+    proficiencies: ["Simple melee", "Simple ranged", "Military ranged (bow, crossbow)", "Light armor", "Navigator's tools"],
+    features: [
+      { name: "Wind-Bone Wings", desc: "Glide 2; falls over 1 sq become glides; while airborne, shift 1 after ranged/area power without provoking." },
+      { name: "Far-Sight", desc: "+2 Perception at long range; no long-range penalty with proficient ranged weapons." },
+      { name: "Wind-Caller", desc: "1/encounter, minor: push 1 creature 1 sq or grant ally +2 to next Athletics (jump/fall)." },
+      { name: "Sky-Step", desc: "When running, +1 speed; when charging while airborne, +1 to attack roll." }
+    ]
+  },
+  thrynn: {
+    name: "Thrynn — Marsh-Stabilized",
+    primaryAbility: "wis", secondaryChoices: ["dex", "con"],
+    speed: 6, languages: ["Common", "Thrynn Click-Speech"],
+    proficiencies: ["Simple melee", "Simple ranged", "Light armor", "Shields", "Artisan's tools (mason's)"],
+    features: [
+      { name: "Structural Awareness", desc: "+2 Perception to detect structural weaknesses; +2 Dungeoneering and Nature for terrain stability." },
+      { name: "Marsh-Strider", desc: "Not slowed by mud, marsh, or shallow water; no penalty for unstable ground." },
+      { name: "Chitin Shell", desc: "+1 AC when not wearing manufactured armor." },
+      { name: "Coordinated Action", desc: "Aid Another bonus increases from +2 to +3; can grant ally within 2 sq +1 to assisted check as free action." }
+    ]
+  },
+  uskel: {
+    name: "Uskel — Hollow-Bound",
+    primaryAbility: "con", secondaryChoices: ["wis", "cha"],
+    speed: 6, languages: ["Common", "Uskel Whisper-Speech"],
+    proficiencies: ["Simple melee", "Simple ranged", "Cloth armor", "Leather armor", "Artisan's tools (calligrapher's)"],
+    features: [
+      { name: "Bound Soul", desc: "At 0 HP, Con save DC 10+1/2lvl once/day to drop to 1 HP; twice/day at 11th." },
+      { name: "Unfinished Resilience", desc: "+2 saves vs death, disease, poison; resist 5 necrotic (scales)." },
+      { name: "Echo Memory", desc: "+2 History and Insight; 1/encounter, roll twice take higher on memory/knowledge checks." },
+      { name: "Pain Threshold", desc: "If damage would reduce below 0 HP, spend healing surge as free action to stay at 0 HP, conscious but dazed." }
+    ]
+  },
+  veylen: {
+    name: "Veylen — Shardborn",
+    primaryAbility: "int", secondaryChoices: ["con", "wis"],
+    speed: 6, languages: ["Common", "Veylen Resonant"],
+    proficiencies: ["Simple melee", "Simple ranged", "Cloth armor", "Leather armor", "Artisan's tools (jeweler's)"],
+    features: [
+      { name: "Crystalline Resilience", desc: "+2 saves vs petrified/restrained; resist 5 radiant (scales)." },
+      { name: "Resonant Skin", desc: "Minor action chime: allies within 3 sq +2 to next save vs frightened." },
+      { name: "Shards of Light", desc: "1/day, standard action burst: enemies make Dex save or take radiant dmg = prof bonus." },
+      { name: "Crystal-Garden Mind", desc: "+2 Arcana and Dungeoneering; 1/encounter, extend a zone/sustained effect by 1 round." }
+    ]
+  },
+  vharin: {
+    name: "Vharin — Deep-Serpent",
+    primaryAbility: "wis", secondaryChoices: ["str", "dex"],
+    speed: 6, languages: ["Common", "Vharin Hiss-Speech"],
+    proficiencies: ["Simple melee", "Military melee (spear, flail)", "Light armor", "Artisan's tools (leatherworker's)"],
+    features: [
+      { name: "Serpentine Body", desc: "+2 Athletics (climb/grapple); +2 Acrobatics (balance); move through Small spaces without squeezing." },
+      { name: "Vibration Sense", desc: "+2 Perception to detect movement through stone/earth/water; detect hidden/invisible within 3 sq on shared surface." },
+      { name: "Cold-Blooded Patience", desc: "+2 saves vs dazed and stunned; 1/encounter, delaying grants +1 to first attack roll." },
+      { name: "Constrictor's Grip", desc: "Grab attacks deal ongoing 2 damage (save ends) while grabbed (scales)." }
+    ]
+  }
+};
+
+// DATA: Classes (unchanged + trainedSkills added)
+const CLASSES = {
+  heartsworn: {
+    name: "Heartsworn of Astridhe", role: "Leader", source: "Divine", keyAbility: "cha",
+    hpBase: 6, surges: 7, defenses: { fort: 1, ref: 0, will: 1 },
+    armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (heavy blade, spear)"],
+    deity: "Astridhe", trainedSkills: ["Diplomacy", "Heal", "Insight", "Religion"],
+    features: [
+      { name: "Star-Mother's Grace", desc: "When you use a healing power on an ally, that ally gains +1 power bonus to next attack roll." },
+      { name: "Radiant Command", desc: "1/encounter, minor: grant an ally within 5 sq a move action." },
+      { name: "Healing Light", desc: "Your healing powers deal radiant damage to enemies adjacent to the healed target." }
+    ]
+  },
+  soulkeeper: {
+    name: "Soul Keeper of Dyhas", role: "Leader", source: "Divine", keyAbility: "wis",
+    hpBase: 6, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (spear, staff)"],
+    deity: "Dyhas", trainedSkills: ["Heal", "History", "Insight", "Religion"],
+    features: [
+      { name: "Passage-Song", desc: "When you heal an ally at 0 HP, they regain extra HP = your WIS mod." },
+      { name: "Threshold Guard", desc: "1/encounter, when ally within 5 sq drops to 0 HP, immediate reaction: grant death save." },
+      { name: "Soul's Echo", desc: "Your divine powers deal necrotic or radiant damage, chosen at use." }
+    ]
+  },
+  oathbound: {
+    name: "Oathbound of Onos", role: "Defender", source: "Divine", keyAbility: "str",
+    hpBase: 8, surges: 8, defenses: { fort: 2, ref: 0, will: 1 },
+    armor: ["Cloth", "Leather", "Hide", "Chainmail", "Scale", "Plate", "Shield"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (all)"],
+    deity: "Onos", trainedSkills: ["Athletics", "Endurance", "Intimidate", "Religion"],
+    features: [
+      { name: "Cord-Mark", desc: "1/encounter, minor: mark target. Marked target -2 attack vs anyone but you." },
+      { name: "Oath of Enforcement", desc: "When you hit a marked target, extra damage = STR mod." },
+      { name: "Threshold Ward", desc: "When enemy enters adjacent sq, immediate interrupt: melee basic attack." }
+    ]
+  },
+  warsinger: {
+    name: "War Singer of Mithar", role: "Striker", source: "Divine", keyAbility: "str",
+    hpBase: 5, surges: 7, defenses: { fort: 2, ref: 1, will: 0 },
+    armor: ["Cloth", "Leather", "Hide", "Chainmail"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (all)", "Military ranged (crossbow)"],
+    deity: "Mithar (Dead)", trainedSkills: ["Athletics", "Endurance", "Intimidate", "Streetwise"],
+    features: [
+      { name: "War-Chant", desc: "1/encounter, minor: you and allies within 5 sq gain +1 damage (+2 at 11th, +3 at 21st)." },
+      { name: "Mithar's Fury", desc: "When you bloody a target, +2 to next attack roll against that target." },
+      { name: "Battle-Swell", desc: "When you spend an action point, shift 2 sq as free action." }
+    ]
+  },
+  trickweaver: {
+    name: "Trick Weaver of Pheksus", role: "Controller", source: "Divine", keyAbility: "cha",
+    hpBase: 5, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
+    armor: ["Cloth", "Leather"],
+    weapons: ["Simple melee", "Simple ranged", "Military ranged (hand crossbow, sling)"],
+    deity: "Pheksus", trainedSkills: ["Bluff", "Stealth", "Streetwise", "Thievery"],
+    features: [
+      { name: "Misdirection", desc: "1/encounter, when attacked, immediate interrupt: force attacker to redirect to another target in range." },
+      { name: "Laughing Escape", desc: "1/encounter, when hit, shift 3 sq as free action; gain combat advantage vs attacker." },
+      { name: "Truth Through Deception", desc: "Powers deal psychic or illusion damage (chosen at use). Damaged enemies grant CA to allies." }
+    ]
+  },
+  balancejudge: {
+    name: "Balance Judge of Phiznir", role: "Controller", source: "Divine", keyAbility: "wis",
+    hpBase: 5, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (hammer, mace)"],
+    deity: "Phiznir", trainedSkills: ["Diplomacy", "Heal", "Insight", "Religion"],
+    features: [
+      { name: "Scales of Judgment", desc: "1/encounter, minor: enemy within 5 sq takes -2 to attack and -2 to all defenses until end of next turn." },
+      { name: "Mercy's Weight", desc: "When you use a healing power, ally also gains +2 to next saving throw." },
+      { name: "Balanced Verdict", desc: "When you hit a judged target, extra damage = WIS mod." }
+    ]
+  },
+  sparkwright: {
+    name: "Sparkwright of Uzotol", role: "Controller", source: "Divine", keyAbility: "int",
+    hpBase: 5, surges: 6, defenses: { fort: 0, ref: 1, will: 1 },
+    armor: ["Cloth", "Leather"],
+    weapons: ["Simple melee", "Simple ranged", "Military ranged (crossbow)"],
+    deity: "Uzotol", trainedSkills: ["Arcana", "History", "Religion", "Thievery"],
+    features: [
+      { name: "Inspiration Resonance", desc: "Your zones grant allies +1 damage when they hit enemies inside (+2 at 11th)." },
+      { name: "Inventor's Focus", desc: "1/encounter, minor: modify a used power by adding push 1, slide 1, or +1d6 damage." },
+      { name: "Uzotol's Spark", desc: "When you use an action point, create a zone within 5 sq; enemies entering take radiant dmg = INT mod." }
+    ]
+  },
+  consecrator: {
+    name: "Consecrator of Ugyn", role: "Controller", source: "Divine", keyAbility: "wis",
+    hpBase: 5, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    armor: ["Cloth", "Leather", "Hide"],
+    weapons: ["Simple melee", "Simple ranged", "Military melee (staff, spear)"],
+    deity: "Ugyn", trainedSkills: ["Insight", "Perception", "Religion", "Streetwise"],
+    features: [
+      { name: "Consequence Tracking", desc: "1/encounter, minor: designate enemy within 5 sq. When that enemy hits ally, immediate interrupt: force reroll, take lower." },
+      { name: "Ripple Effect", desc: "When you hit an enemy with a divine power, one ally within 5 sq shifts 1 as free action." },
+      { name: "Ugyn's Question", desc: "1/encounter: ask DM a question about current situation; DM answers truthfully and briefly." }
+    ]
+  },
+  brightone: {
+    name: "Bright One Ritualist", role: "Leader", source: "Divine", keyAbility: "cha",
+    hpBase: 6, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
+    armor: ["Cloth", "Leather"],
+    weapons: ["Simple melee", "Simple ranged"],
+    deity: "Twin Bright Ones", trainedSkills: ["Diplomacy", "History", "Insight", "Religion"],
+    features: [
+      { name: "Ritual Chorus", desc: "At start of each encounter, choose a chorus: Star, Soul, Oath, Joy, Question, Scale, or Laugh. Each grants a different bonus." },
+      { name: "Many-Faced Blessing", desc: "When you use a healing power, add effect based on current chorus (Star: +1 attack, Soul: save vs condition, Oath: +1 AC, Joy: temp HP, Question: +2 skill, Scale: +1 defense, Laugh: CA)." },
+      { name: "Synthesis", desc: "1/day: use two choruses simultaneously for one encounter." }
+    ]
+  }
+};
+
+// DATA: Feats (unchanged)
+const FEATS = [
+  {id:"echo_firstsoul",name:"Echo of the First-Soul",tier:"Heroic",origin:"Divine",prereq:"Any divine class, Wisdom 13+",desc:"Reroll 1s on attack, save, or check. 1/encounter, modify a single-target power to target one additional creature.",matchClasses:["heartsworn","soulkeeper","consecrator"],matchSpecies:["uskel","glassbound","marai"]},
+  {id:"chosen_astridhe",name:"Chosen of Astridhe",tier:"Heroic",origin:"Divine",prereq:"Heartsworn of Astridhe or divine class aligned to Astridhe, Charisma 14+",desc:"When you use a radiant or healing power, first enemy adjacent to you at end of turn takes 1d6 radiant. 1/encounter, increase healing by WIS mod.",matchClasses:["heartsworn","brightone"],matchSpecies:["thrynn","shayln"]},
+  {id:"echo_dyhas",name:"Echo of Dyhas",tier:"Heroic",origin:"Divine",prereq:"Soul Keeper of Dyhas or divine class using healing powers, Wisdom 13+",desc:"Immediate reaction: when ally you healed drops to 0 HP, they stay at 1 HP instead. 1/day, remove one condition from dying/frightened creature.",matchClasses:["soulkeeper","brightone"],matchSpecies:["marai","uskel"]},
+  {id:"warrior_light",name:"Warrior of Light",tier:"Heroic",origin:"Divine",prereq:"Heartsworn of Astridhe or War Singer of Mithar, Str or Cha 14+",desc:"When you hit with radiant/fire, convert half damage to the other type. When you charge/bull rush, spend 1 surge to grant ally same movement.",matchClasses:["heartsworn","warsinger"],matchSpecies:["thrynn","shayln"]},
+  {id:"shayln_glide",name:"Shayln Glide Master",tier:"Heroic",origin:"Racial",prereq:"Shayln, Dexterity 13+",desc:"Glide 2. Falls over 1 sq become glides at half distance. When using ranged/area power while airborne, slide 1 without provoking.",matchClasses:["heartsworn","warsinger"],matchSpecies:["shayln"]},
+  {id:"glassbound_prism",name:"Glassbound Prism",tier:"Heroic",origin:"Racial",prereq:"Glassbound, Charisma 13+",desc:"Reduce spell damage by CON mod (min 1). 1/encounter, blind first enemy that fails save vs your radiant/light power.",matchClasses:["heartsworn","brightone"],matchSpecies:["glassbound"]},
+  {id:"harun_thunder",name:"Harun Thunder-Cry",tier:"Heroic",origin:"Racial",prereq:"Harun",desc:"Thunder damage area +1 sq; add thunder dmg = level. On attack roll 17-20, gain healing surge benefit.",matchClasses:["warsinger"],matchSpecies:["harun"]},
+  {id:"vein_touched",name:"Vein-Touched",tier:"Heroic",origin:"Divine",prereq:"Divine class linked to Archades Vein, Int or Wis 13+",desc:"Extend zone/aura/sustained effect duration by 1 turn. 1/encounter, if next to your radiant/fire power, slide 1 and add 1d6 to lingering effect.",matchClasses:["heartsworn","soulkeeper","consecrator"],matchSpecies:["veylen","uskel"]},
+  {id:"threshold_walker",name:"Threshold Walker",tier:"Heroic",origin:"Divine",prereq:"Divine class using healing/protection powers, Wisdom 13+",desc:"Move through door/archway/zone: slide 1 and +1 to next attack. End turn adjacent to door: force first hostile entering to roll twice, take lower.",matchClasses:["oathbound"],matchSpecies:["veylen","glassbound"]},
+  {id:"echo_seeker",name:"Echo-Seeker",tier:"Heroic",origin:"Divine",prereq:"Any divine class, Wisdom 14+",desc:"At start of encounter, DM gives one true fact about location/enemy. Next save by ally who hears you gains +1.",matchClasses:["consecrator"],matchSpecies:["uskel","marai","thrynn"]},
+  {id:"cord_mark",name:"Cord-Mark",tier:"Heroic",origin:"Class",prereq:"Oathbound, Strength 13+",desc:"When you use Cord-Mark, one ally adjacent to you or the marked target gains a +1 power bonus to attack rolls against that target until the end of your next turn.",matchClasses:["oathbound"]},
+  {id:"scales_of_judgment",name:"Scales of Judgment",tier:"Heroic",origin:"Class",prereq:"Balance Judge, Wisdom 13+",desc:"When you use Scales of Judgment, one ally within 5 squares of the judged target gains a +1 power bonus to attack rolls against it until the end of your next turn.",matchClasses:["balancejudge"]},
+  {id:"misdirection",name:"Misdirection",tier:"Heroic",origin:"Class",prereq:"Trick Weaver, Charisma 13+",desc:"Once per encounter, when an enemy attacks you and misses, you can slide it 2 squares and it grants combat advantage until the end of your next turn.",matchClasses:["trickweaver"]},
+  {id:"truth_through_deception",name:"Truth Through Deception",tier:"Heroic",origin:"Class",prereq:"Trick Weaver, Charisma 13+",desc:"When a divine power you use deals psychic or illusion damage, one ally who can see the target gains a +1 power bonus to their next attack roll against it.",matchClasses:["trickweaver"]},
+  {id:"inspiration_resonance",name:"Inspiration Resonance",tier:"Heroic",origin:"Class",prereq:"Sparkwright, Intelligence 13+",desc:"When an ally inside one of your zones hits an enemy, that ally gains temporary hit points equal to your Intelligence modifier and can shift 1 square as a free action.",matchClasses:["sparkwright"]},
+  {id:"uzotols_spark",name:"Uzotol's Spark",tier:"Heroic",origin:"Class",prereq:"Sparkwright, Intelligence 13+",desc:"Once per encounter, when you spend an action point, create a 2-square zone within 5 squares that lasts until the end of the encounter. Allies in the zone gain a +1 power bonus to damage rolls; enemies entering it take radiant damage equal to your Intelligence modifier.",matchClasses:["sparkwright"]},
+  {id:"dorvax_hiveecho",name:"Hive-Echo Strike",tier:"Heroic",origin:"Racial",prereq:"Dorvax",desc:"When you hit with a melee attack, one ally within 5 squares of you gains a +2 power bonus to their next attack roll against that target before the end of their next turn.",matchSpecies:["dorvax"]},
+  {id:"keshari_heartstone",name:"Heart-Stone Resolve",tier:"Heroic",origin:"Racial",prereq:"Keshari, Constitution 13+",desc:"When you use Heart-Stone or gain temporary hit points, you also gain a +1 power bonus to Fortitude and saving throws against frightened or charmed until the end of the encounter.",matchSpecies:["keshari"]},
+  {id:"vharin_constrictor",name:"Constrictor's Strike",tier:"Heroic",origin:"Racial",prereq:"Vharin",desc:"When you hit with a melee attack, you can grab the target. While grabbed by you, the target takes ongoing 2 damage (save ends).",matchSpecies:["vharin"]},
+  {id:"enduring_coffin",name:"Coffin's Response",tier:"Heroic",origin:"Racial",prereq:"Enduring",desc:"Immediate Reaction: when you are hit by an attack that deals damage, shift 1 square and gain resist 5 to that attack's damage type until the end of your next turn. If the attack dealt psychic damage, shift 2 squares and gain resist 10 instead.",matchSpecies:["enduring"]}
+];
+
+// DATA: Skills
+const SKILLS = [
+  {name:"Acrobatics",ability:"dex"},{name:"Arcana",ability:"int"},{name:"Athletics",ability:"str"},
+  {name:"Bluff",ability:"cha"},{name:"Diplomacy",ability:"cha"},{name:"Dungeoneering",ability:"wis"},
+  {name:"Endurance",ability:"con"},{name:"Heal",ability:"wis"},{name:"History",ability:"int"},
+  {name:"Insight",ability:"wis"},{name:"Intimidate",ability:"cha"},{name:"Nature",ability:"wis"},
+  {name:"Perception",ability:"wis"},{name:"Religion",ability:"int"},{name:"Stealth",ability:"dex"},
+  {name:"Streetwise",ability:"cha"},{name:"Thievery",ability:"dex"}
+];
+const ABILITY_ABBREV = {str:"STR",con:"CON",dex:"DEX",int:"INT",wis:"WIS",cha:"CHA"};
+
+// DATA: Expanded Powers
+const POWERS = {
+  heartsworn: {
+    atwill: [
+      {name:"Starlit Rebuke",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Implement",desc:"CHA vs AC. Hit: 1d8 + CHA radiant. One ally adjacent to you or target gains +2 to attack vs target."},
+      {name:"Guiding Constellation",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"Target ally shifts 2 sq. If ends adjacent to enemy, enemy takes radiant = CHA mod, ally +1 to attack."},
+      {name:"Astridhe's Embrace",action:"Standard",range:"Ranged 5",keywords:"Divine, Radiant, Implement",desc:"CHA vs Ref. Hit: 1d6 + CHA radiant. One ally within 5 sq gains temp HP = CHA mod + 2."},
+      {name:"Starlight Lance",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"CHA vs AC. Hit: 1d8 + CHA radiant, push 1 sq. If target hits an ally before end of next turn, target takes radiant = CHA mod."}
+    ],
+    encounter: [
+      {name:"Benediction of the Star-Mother",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Radiant",desc:"Target ally spends healing surge + 1d6 + CHA mod HP. Ally +1 to next attack. Adjacent enemies take radiant = CHA mod."},
+      {name:"Constellation Cascade",action:"Standard",range:"Close burst 3",keywords:"Divine, Radiant, Implement",desc:"Each enemy in burst. CHA vs Will. Hit: 1d6 + CHA radiant. One ally in burst shifts 2 as free action."},
+      {name:"Star-Mother's Ward",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally gains +2 AC and resist 5 radiant until end of next turn. If ally is bloodied, also gains temp HP = CHA mod."}
+    ],
+    utility: [
+      {name:"Radiant Command",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally within range shifts 2 squares and gains a +1 power bonus to the next attack roll or saving throw they make before the end of your next turn."},
+      {name:"Light of the Star-Mother",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally gains +2 to next saving throw. If that ally is bloodied, they also regain HP = CHA mod."},
+      {name:"Astridhe's Step",action:"Move",range:"Personal",keywords:"Divine, Radiant",desc:"Shift 2 squares. One ally within 3 sq shifts 1 as a free action. You and that ally gain +1 to next attack."}
+    ],
+    daily: [
+      {name:"Hearth of the First Star",action:"Standard",range:"Close burst 2",keywords:"Divine, Radiant, Zone",desc:"Zone of starlight until end of encounter. Allies +2 AC/Will. Enemies: difficult terrain, 1d6 + CHA radiant on enter/start. Sustain minor."},
+      {name:"Starfall Benediction",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Radiant",desc:"Each ally spends healing surge + 2d6 HP. Each enemy in burst takes 2d6 + CHA radiant. Allies +1 to attack until end of next turn."},
+      {name:"Astridhe's Lament",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Radiant, Implement",desc:"CHA vs Will. Hit: 3d8 + CHA psychic + radiant, dazed (save ends). Allies within 5 sq of target gain +2 to attack until end of next turn. Miss: Half damage."}
+    ]
+  },
+  soulkeeper: {
+    atwill: [
+      {name:"Soul-Tide Strike",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Necrotic, Implement",desc:"WIS vs AC. Hit: 1d8 + WIS radiant or necrotic (choose)."},
+      {name:"Passage Hymn",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing",desc:"Target ally spends healing surge + WIS mod HP. Target can make a saving throw."},
+      {name:"Dyhas' Comfort",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing",desc:"One ally spends a healing surge and regains HP = surge value + WIS mod. Ally gains +2 to next saving throw."},
+      {name:"Whisper of the Departed",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 1d6 + WIS psychic. Target grants combat advantage to allies until end of next turn."}
+    ],
+    encounter: [
+      {name:"At the Quiet Threshold",action:"Standard",range:"Ranged 5",keywords:"Divine, Healing",desc:"Target ally spends surge + 2d6 + WIS mod HP. End one condition (dazed/dominated/stunned/weakened/slowed/immobilized/ongoing). If at 0 HP, stands up."},
+      {name:"Dyhas' Mercy",action:"Standard",range:"Ranged 5",keywords:"Divine, Healing, Radiant",desc:"Target ally spends surge + 2d6 + WIS HP. End two conditions. If ally is at 0 HP, they stand and shift 2 as free action."},
+      {name:"Soul Shield",action:"Immediate Interrupt",range:"Ranged 5",keywords:"Divine, Radiant",desc:"Trigger: ally within 5 sq is hit by an attack. Effect: ally gains resist = WIS mod x 2 against that attack. If attack is necrotic, ally also gains +2 to next save."}
+    ],
+    utility: [
+      {name:"Passage Vigil",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing",desc:"One ally within range gains a +2 power bonus to their next saving throw. If that ally is dying, they also regain hit points equal to your Wisdom modifier."},
+      {name:"Dyhas' Watch",action:"Minor",range:"Close burst 5",keywords:"Divine",desc:"Each ally in burst gains +2 to death saves and saves vs fear until end of encounter. One dying ally immediately stabilizes."},
+      {name:"Last Rite",action:"Standard",range:"Ranged 5",keywords:"Divine, Healing, Necrotic",desc:"One dying ally immediately stabilizes, spends a healing surge, and stands up. Enemies adjacent to the ally take necrotic = WIS mod."}
+    ],
+    daily: [
+      {name:"Choir of the Last Door",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Radiant, Necrotic",desc:"You and each ally gain soul-shield: first time reduced to 0 HP each round, reduced to 1 instead. Sustain minor."},
+      {name:"Dyhas' Requiem",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Necrotic",desc:"Each ally in burst spends a healing surge + 2d6 HP. Each enemy takes 2d6 + WIS necrotic. Allies gain +2 to all saves until end of encounter."},
+      {name:"Passage of the Quiet Door",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Necrotic, Implement",desc:"WIS vs Will. Hit: 3d6 + WIS psychic + necrotic. Target is removed from combat for 1 round (save ends) — cannot act, be targeted, or affect the battle. Miss: Half damage, dazed (save ends)."}
+    ]
+  },
+  oathbound: {
+    atwill: [
+      {name:"Oathbrand Slash",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"STR vs AC. Hit: 1d8 + STR radiant. Mark target until end of next turn. If already marked, extra radiant = STR mod."},
+      {name:"Threshold Sweep",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"STR vs Fort. Hit: 1d8 + STR radiant. Slide target 1 sq. You shift 1 sq."},
+      {name:"Onos' Verdict",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"STR vs AC. Hit: 1d8 + STR radiant. Mark target. If target attacks an ally before end of next turn, that ally gains +1 AC."},
+      {name:"Cord of Binding",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"STR vs Fort. Hit: 1d6 + STR radiant. Target cannot shift until end of next turn. If target is marked, it also cannot teleport."}
+    ],
+    encounter: [
+      {name:"Sentence of the Broken Vow",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"Target must be marked by you. STR vs AC. Hit: 2d8 + STR radiant. Until end of next turn, if target attacks anyone but you, takes radiant = STR mod. Miss: Half damage, mark persists."},
+      {name:"Oath of Enforcement",action:"Standard",range:"Close burst 1",keywords:"Divine, Radiant, Weapon",desc:"Each enemy in burst. STR vs AC. Hit: 1d8 + STR radiant. Mark each target until end of next turn. If a marked target attacks an ally, you can shift 2 and make a melee basic attack against it as immediate interrupt."},
+      {name:"Threshold Guardian",action:"Minor",range:"Personal",keywords:"Divine, Radiant",desc:"Until end of next turn, enemies that enter squares adjacent to you are marked. You gain +1 AC for each marked enemy adjacent to you (max +3)."}
+    ],
+    utility: [
+      {name:"Threshold Ward",action:"Minor",range:"Personal",keywords:"Divine, Radiant",desc:"Until end of next turn, first enemy that enters a square adjacent to you takes -2 to attack rolls against you, and you can shift 1 sq as free action."},
+      {name:"Onos' Shield",action:"Minor",range:"Personal",keywords:"Divine, Radiant",desc:"Gain +2 AC until end of next turn. Adjacent allies also gain +1 AC. If an adjacent enemy attacks an ally, you can shift 1 as immediate interrupt."},
+      {name:"Cord-Brother",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"Designate one ally within 5 sq. Until end of encounter, when that ally is hit, you can shift 2 as immediate interrupt and make a melee basic attack against the attacker. Change designated ally as minor action."}
+    ],
+    daily: [
+      {name:"Palisade of the First Oath",action:"Minor",range:"Personal",keywords:"Divine, Stance, Radiant",desc:"Stance: +2 AC/Reflex. Adjacent enemies marked. Marked enemy that shifts/teleports/attacks non-you: 1d10 + STR radiant, cannot shift until end of next turn."},
+      {name:"Onos' Final Judgment",action:"Standard",range:"Melee 1",keywords:"Divine, Radiant, Weapon",desc:"STR vs AC. Hit: 3d10 + STR radiant. Target marked (save ends). If target attacks an ally while marked, it is knocked prone and takes radiant = STR mod x 2. Miss: Half damage, marked until end of next turn."},
+      {name:"Wall of Oaths",action:"Minor",range:"Close blast 5",keywords:"Divine, Radiant, Zone",desc:"Create a wall of radiant light 5 sq long within 5 sq. The wall lasts until end of encounter. Enemies cannot pass through without taking 1d8 + STR radiant. Allies can pass freely. Sustain minor."}
+    ]
+  },
+  warsinger: {
+    atwill: [
+      {name:"Mithar's Cleaving Chorus",action:"Standard",range:"Melee 1",keywords:"Divine, Fire, Radiant, Weapon",desc:"STR vs AC. Hit: 1d8 + STR fire+radiant. If bloodied, extra fire+radiant = STR mod."},
+      {name:"War-Run Canticle",action:"Standard",range:"Melee 1",keywords:"Divine, Fire, Radiant, Weapon",desc:"Shift 1 before attack. If end adjacent to target, combat advantage. STR vs AC. Hit: 1d8 + STR fire+radiant."},
+      {name:"Ember March",action:"Move",range:"Personal",keywords:"Divine, Fire",desc:"Shift up to your speed. +2 to next attack roll this turn. Each enemy you move adjacent to takes fire = STR mod (min 1)."},
+      {name:"Mithar's Throw",action:"Standard",range:"Ranged 5",keywords:"Divine, Fire, Radiant, Weapon",desc:"STR vs AC. Hit: 1d6 + STR fire+radiant. If target is bloodied, +1d6 fire. If hit, target is marked until end of next turn."}
+    ],
+    encounter: [
+      {name:"Fury of the Fallen God",action:"Standard",range:"Melee 1",keywords:"Divine, Fire, Radiant, Weapon",desc:"Two targets, STR vs AC each. Hit: 2d8 + STR fire+radiant. If bloodied, ongoing 5 fire (save ends). If one target, both attacks vs it."},
+      {name:"Mithar's Wrath",action:"Standard",range:"Melee 1",keywords:"Divine, Fire, Radiant, Weapon",desc:"STR vs AC. Hit: 2d8 + STR fire+radiant. If target is bloodied, make a secondary attack: STR vs Ref, 1d8 + STR fire. If secondary hits, target is pushed 2."},
+      {name:"Burning Chorus",action:"Standard",range:"Close blast 3",keywords:"Divine, Fire, Radiant, Weapon",desc:"Each enemy in blast. STR vs Ref. Hit: 1d8 + STR fire, ongoing 5 fire (save ends). Allies in blast gain +2 to next attack."}
+    ],
+    utility: [
+      {name:"Battle-Swell",action:"Minor",range:"Personal",keywords:"Divine, Fire, Radiant",desc:"Until end of next turn, +2 speed and next hit with divine attack grants one ally within 5 sq +1 to damage on next attack."},
+      {name:"War Cry",action:"Minor",range:"Close burst 5",keywords:"Divine, Fire",desc:"You and each ally in burst gain +2 to next attack roll. If you are bloodied, allies also gain +2 to damage on next attack."},
+      {name:"Mithar's Endurance",action:"Minor",range:"Personal",keywords:"Divine, Fire",desc:"Spend a healing surge. Gain temp HP = level + STR mod. Until end of next turn, resist 5 fire and +2 to Endurance checks."}
+    ],
+    daily: [
+      {name:"Mithar's Last Trumpet",action:"Standard",range:"Close blast 3",keywords:"Divine, Fire, Radiant, Weapon",desc:"Each enemy in blast. STR vs Ref. Hit: 3d8 + STR fire+radiant, push 2, knock prone. Miss: Half damage."},
+      {name:"Mithar's War Form",action:"Minor",range:"Personal",keywords:"Divine, Fire, Stance",desc:"Stance: +2 speed, +2 to attack rolls. When you bloody a target, +1d8 fire damage. When you drop a target to 0, shift 3 and make melee basic attack."},
+      {name:"Fallen God's Fury",action:"Standard",range:"Melee 1",keywords:"Divine, Fire, Radiant, Weapon",desc:"STR vs AC. Hit: 3d10 + STR fire+radiant, ongoing 10 fire (save ends). If target drops to 0, shift 3 and make melee basic attack against another enemy. Miss: Half damage, ongoing 5 fire (save ends)."}
+    ]
+  },
+  trickweaver: {
+    atwill: [
+      {name:"Pheksus' Tangle",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Illusion, Implement",desc:"CHA vs Ref. Hit: 1d6 + CHA psychic. Slide target 2 sq."},
+      {name:"Mask of Honest Lies",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Illusion, Implement",desc:"CHA vs Will. Hit: 1d8 + CHA psychic. Target grants CA until end of next turn. If already granting CA, -2 to saves."},
+      {name:"Pheksus' Whisper",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Illusion, Implement",desc:"CHA vs Will. Hit: 1d6 + CHA psychic. Target makes a melee basic attack against an ally of your choice as free action."},
+      {name:"Mirror Step",action:"Move",range:"Personal",keywords:"Divine, Illusion",desc:"Teleport 3. Create illusory duplicate in your previous square. Enemies that attack the duplicate waste their action. Allies gain CA vs enemies adjacent to the duplicate."}
+    ],
+    encounter: [
+      {name:"Shattered Mirror Riot",action:"Standard",range:"Close burst 2",keywords:"Divine, Psychic, Illusion, Implement",desc:"Each enemy in burst. CHA vs Will. Hit: 1d6 + CHA psychic, dazed until end of next turn. Slide 1."},
+      {name:"Pheksus' Reversal",action:"Immediate Interrupt",range:"Ranged 10",keywords:"Divine, Psychic, Illusion",desc:"Trigger: enemy within 10 hits an ally. Effect: redirect the attack to another target in range. The original target takes no damage. The new target takes psychic = CHA mod."},
+      {name:"House of Mirrors",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Psychic, Illusion, Implement",desc:"Each enemy in burst. CHA vs Will. Hit: 1d8 + CHA psychic, dazed (save ends). The burst becomes a zone of mirrors until end of next turn: enemies that enter are slowed."}
+    ],
+    utility: [
+      {name:"Laughing Escape",action:"Immediate Reaction",range:"Personal",keywords:"Divine, Illusion",desc:"Trigger: you are hit by an attack. Effect: shift 3 squares and gain combat advantage against the attacker until end of next turn."},
+      {name:"Pheksus' Veil",action:"Minor",range:"Close burst 2",keywords:"Divine, Illusion",desc:"You and one ally in burst become hidden until end of next turn. Attacking ends the hidden state for the attacker."},
+      {name:"Trick Step",action:"Move",range:"Personal",keywords:"Divine, Illusion",desc:"Shift 3. Leave behind an illusory duplicate that lasts until end of next turn. Enemies that target the duplicate waste their action and grant CA to allies."}
+    ],
+    daily: [
+      {name:"Grand Masquerade of Pheksus",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Psychic, Illusion, Implement, Zone",desc:"Each enemy in burst. CHA vs Will. Hit: 3d8 + CHA psychic, dazed. Miss: Half. Zone of shifting doubles: difficult terrain for enemies, blinded on start of turn. Sustain minor."},
+      {name:"Pheksus' Grand Illusion",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Illusion, Implement",desc:"CHA vs Will. Hit: 3d6 + CHA psychic. Target dominated (save ends). While dominated, target attacks its allies. Miss: Half damage, dazed (save ends)."},
+      {name:"Carnival of Lies",action:"Standard",range:"Close burst 5",keywords:"Divine, Psychic, Illusion, Implement",desc:"Each enemy in burst. CHA vs Will. Hit: 2d8 + CHA psychic, dazed and grants CA (save ends). Each ally in burst gains +2 to attack until end of next turn. Miss: Half damage, grants CA until end of next turn."}
+    ]
+  },
+  balancejudge: {
+    atwill: [
+      {name:"Scales of Warning",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs Will. Hit: 1d8 + WIS radiant. Mark by judgment until end of next turn. If marked target attacks non-you, radiant = WIS mod."},
+      {name:"Merciful Repositioning",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs Fort. Hit: 1d6 + WIS radiant. Slide 2 sq (3 if marked by judgment)."},
+      {name:"Phiznir's Verdict",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs Will. Hit: 1d6 + WIS radiant. Target takes -2 to one defense of your choice until end of next turn."},
+      {name:"Weight of Justice",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs Fort. Hit: 1d8 + WIS radiant. Target slowed until end of next turn. If target is marked by judgment, also cannot shift."}
+    ],
+    encounter: [
+      {name:"Verdict of the Scales",action:"Standard",range:"Close burst 2",keywords:"Divine, Radiant, Implement",desc:"Each enemy in burst. WIS vs Will. Hit: 2d8 + WIS radiant, slowed and cannot shift until end of next turn."},
+      {name:"Judgment Strike",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs AC. Hit: 2d8 + WIS radiant. Target weakened (save ends). If target is marked by judgment, also dazed until end of next turn."},
+      {name:"Phiznir's Balance",action:"Minor",range:"Ranged 10",keywords:"Divine, Radiant",desc:"One enemy within 10 takes -2 to attack rolls. One ally within 10 gains +2 to attack rolls. Both effects last until end of next turn."}
+    ],
+    utility: [
+      {name:"Mercy's Weight",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally within 5 sq gains +2 to next saving throw. If that ally is bloodied, they also gain temp HP = WIS mod."},
+      {name:"Phiznir's Shield",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally gains resist 5 to all damage until end of next turn. If ally is marked by your judgment, resist increases to 10."},
+      {name:"Scale of Mercy",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing, Radiant",desc:"One dying ally stabilizes and gains temp HP = WIS mod + level. If ally is at 0 HP, they stand and shift 1 as free action."}
+    ],
+    daily: [
+      {name:"Circle of Equitable Dawn",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Radiant, Implement, Zone",desc:"Each enemy. WIS vs Will. Hit: 3d8 + WIS radiant, weakened (save ends). Miss: Half. Zone: enemies -2 attack, cannot shift. Allies +2 saves. Sustain minor."},
+      {name:"Phiznir's Final Verdict",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"WIS vs Will. Hit: 3d8 + WIS radiant, stunned (save ends). Allies adjacent to target gain +2 to all defenses until end of next turn. Miss: Half damage, dazed (save ends)."},
+      {name:"Field of Judgment",action:"Minor",range:"Area 3x3 within 10",keywords:"Divine, Radiant, Zone",desc:"Create a zone of judgment. Enemies in zone: -2 to all defenses. Allies in zone: +2 to all defenses. Zone lasts until end of encounter. Sustain minor."}
+    ]
+  },
+  sparkwright: {
+    atwill: [
+      {name:"Uzotol's Flicker",action:"Standard",range:"Area burst 1 within 10",keywords:"Divine, Radiant, Zone",desc:"Each enemy in burst. INT vs Ref. Hit: 1d6 + INT radiant. Zone of inspiration until end of next turn: difficult terrain for enemies, allies shift 1 free on start."},
+      {name:"Tethered Spark",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant",desc:"INT vs Fort. Hit: 1d6 + INT radiant. Push 1 sq. If in your zone, slide 1 instead."},
+      {name:"Uzotol's Hammer",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"INT vs AC. Hit: 1d8 + INT radiant. Push 2 sq. If target is in your zone, push 3 and target is slowed until end of next turn."},
+      {name:"Spark Jump",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"INT vs Ref. Hit: 1d6 + INT radiant. If target is in your zone, teleport to a square adjacent to target and make a secondary attack: INT vs AC, 1d6 + INT radiant."}
+    ],
+    encounter: [
+      {name:"Workshop Bloom",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Radiant, Zone",desc:"Each enemy in burst. INT vs Will. Hit: 2d6 + INT radiant. Zone until end of encounter: allies +1 attack, shift 1 free once per turn."},
+      {name:"Uzotol's Engine",action:"Standard",range:"Area 3x3 within 10",keywords:"Divine, Radiant, Zone",desc:"Create a zone of radiant energy. Enemies entering take radiant = INT mod. Allies in zone gain +1 to attack rolls. Zone lasts until end of encounter."},
+      {name:"Spark Burst",action:"Standard",range:"Area burst 1 within 10",keywords:"Divine, Radiant, Implement",desc:"Each enemy in burst. INT vs Ref. Hit: 1d8 + INT radiant. Push 2. If target is in your zone, push 3 and target is dazed until end of next turn."}
+    ],
+    utility: [
+      {name:"Inventor's Focus",action:"Minor",range:"Personal",keywords:"Divine, Radiant",desc:"Until end of next turn, next divine attack or power gains one rider: push 1, slide 1, or +1d6 damage."},
+      {name:"Uzotol's Insight",action:"Minor",range:"Personal",keywords:"Divine, Radiant",desc:"You or one ally in your zone gains +2 to next attack or skill check. If in a zone, also gain +2 to all defenses until end of next turn."},
+      {name:"Resonant Repair",action:"Minor",range:"Ranged 5",keywords:"Divine, Radiant",desc:"One ally or construct in your zone gains temp HP = INT mod + level. If target is at 0 HP, they stand and shift 1 as free action."}
+    ],
+    daily: [
+      {name:"Cathedral of the Radiant Engine",action:"Standard",range:"Area burst 3 within 10",keywords:"Divine, Radiant, Zone",desc:"Each enemy. INT vs Ref. Hit: 2d8 + INT radiant, slowed (save ends). Miss: Half. Zone: difficult terrain for enemies, radiant = INT mod on enter/start + slowed. Allies +2 attack, ignore difficult terrain. Sustain minor."},
+      {name:"Uzotol's Masterwork",action:"Standard",range:"Area 5x5 within 10",keywords:"Divine, Radiant, Zone",desc:"Create a large zone of radiant energy. Enemies in zone: slowed, take radiant = INT mod on start of turn. Allies in zone: +2 to attack, shift 1 as free action once per turn. Zone lasts until end of encounter. Sustain minor."},
+      {name:"Spark Storm",action:"Standard",range:"Area burst 3 within 10",keywords:"Divine, Radiant, Implement, Zone",desc:"Each enemy in burst. INT vs Ref. Hit: 2d6 + INT radiant, immobilized (save ends). The burst becomes a zone of sparks: enemies entering take radiant = INT mod. Sustain minor."}
+    ]
+  },
+  consecrator: {
+    atwill: [
+      {name:"Ugyn's Rebuke",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 1d8 + WIS psychic. Target -2 to next attack. If that attack hits ally, target rerolls and takes lower."},
+      {name:"Ripple of Outcome",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Ref. Hit: 1d6 + WIS psychic. Slide target 1. One ally within 5 of target shifts 1 free."},
+      {name:"Ugyn's Question",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 1d6 + WIS psychic. Target must answer a question truthfully (in character) or take extra psychic = WIS mod."},
+      {name:"Consequence Strike",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Ref. Hit: 1d8 + WIS psychic. If target attacked an ally since end of your last turn, +1d6 psychic and target is slowed until end of next turn."}
+    ],
+    encounter: [
+      {name:"Loaded Question",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 2d6 + WIS psychic. Marked by Ugyn. First time marked target hits ally, reroll take lower. If still hits, psychic = WIS mod. If misses ally, one ally shifts 1 free."},
+      {name:"Ugyn's Judgment",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 2d6 + WIS psychic. Target cannot attack an ally you designate (save ends). If target attacks the designated ally, it takes psychic = WIS mod x 2 and is dazed until end of next turn."},
+      {name:"Ripple Burst",action:"Standard",range:"Close burst 2",keywords:"Divine, Psychic, Implement",desc:"Each enemy in burst. WIS vs Will. Hit: 1d6 + WIS psychic. Each enemy hit causes one other enemy within 3 sq to take psychic = WIS mod."}
+    ],
+    utility: [
+      {name:"Ugyn's Question",action:"Minor",range:"Ranged 10",keywords:"Divine, Psychic",desc:"One enemy within range takes -2 to attack rolls against one ally of your choice until end of next turn. If that enemy still hits that ally, one ally within 5 sq can shift 1 as free action."},
+      {name:"Ugyn's Truth",action:"Minor",range:"Ranged 10",keywords:"Divine, Psychic",desc:"Learn one true fact about a target (DM's choice of what's true). Target takes -2 to Will until end of next turn."},
+      {name:"Consequence Ward",action:"Minor",range:"Ranged 5",keywords:"Divine, Psychic",desc:"One ally gains +2 to all defenses against next attack. If attacker hits, attacker takes psychic = WIS mod. If attacker misses, ally gains temp HP = WIS mod."}
+    ],
+    daily: [
+      {name:"Circle of Consequences",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Psychic, Zone",desc:"Each enemy. WIS vs Will. Hit: 3d6 + WIS psychic, slowed (save ends). Miss: Half. Zone: enemies -2 attack vs allies. First time each round enemy hits ally, psychic = WIS mod and reroll lower. Sustain minor."},
+      {name:"Ugyn's Final Question",action:"Standard",range:"Ranged 10",keywords:"Divine, Psychic, Implement",desc:"WIS vs Will. Hit: 3d6 + WIS psychic. Target removed from time for 1 round (save ends) — cannot act, be targeted, or affect the battle. Allies gain +2 to all attacks until target returns. Miss: Half damage, dazed (save ends)."},
+      {name:"Web of Consequences",action:"Standard",range:"Area burst 2 within 10",keywords:"Divine, Psychic, Zone",desc:"Each enemy in burst. WIS vs Will. Hit: 2d6 + WIS psychic, slowed (save ends). Zone: enemies that attack allies take psychic = WIS mod. Allies in zone gain +1 to all saves. Sustain minor."}
+    ]
+  },
+  brightone: {
+    atwill: [
+      {name:"Starfire Hymn",action:"Standard",range:"Melee or Ranged 5",keywords:"Divine, Radiant, Fire",desc:"CHA vs Ref. Hit: 1d8 + CHA radiant+fire. One ally within 5 gains current chorus benefit."},
+      {name:"Resonant Benediction",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing",desc:"Target ally spends surge + CHA mod HP. Plus chorus bonus: Star +1 attack, Soul save, Oath +2 AC, Joy temp HP = CHA, Question +2 skill, Scale +1 defense, Laugh CA vs adjacent enemy."},
+      {name:"Twin Light Strike",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Fire, Implement",desc:"CHA vs Ref. Hit: 1d8 + CHA radiant+fire. Choose chorus effect on hit: Star (ally +1 attack), Joy (ally temp HP = CHA), or Laugh (target grants CA)."},
+      {name:"Joyful Spark",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Implement",desc:"CHA vs Will. Hit: 1d6 + CHA radiant. One ally within 5 gains temp HP = CHA mod + current chorus benefit."}
+    ],
+    encounter: [
+      {name:"Chorus of Two Voices",action:"Minor",range:"Close burst 5",keywords:"Divine, Healing",desc:"End current chorus, choose new one. Target gains both old and new chorus benefits. If self, shift 1. If one Uzotol + one Ugyn chorus, temp HP = CHA mod."},
+      {name:"Bright One's Blessing",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Radiant, Fire",desc:"Each ally in burst gains current chorus benefit + spends healing surge + 1d6 + CHA HP. Each enemy in burst takes radiant+fire = CHA mod."},
+      {name:"Dual Chorus Strike",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Fire, Implement",desc:"CHA vs AC. Hit: 2d6 + CHA radiant+fire. Apply two chorus effects: Star (+1 attack to ally), Soul (ally saves), Oath (+2 AC to ally), Joy (temp HP), Question (+2 skill), Scale (+1 defense), or Laugh (CA). Choose two different effects."}
+    ],
+    utility: [
+      {name:"Ritual Chorus",action:"Minor",range:"Personal",keywords:"Divine, Healing",desc:"Choose a chorus: Star, Soul, Oath, Joy, Question, Scale, or Laugh. Until end of next turn, treat that chorus as active for your healing and blessing powers."},
+      {name:"Chorus Shift",action:"Minor",range:"Close burst 5",keywords:"Divine, Radiant",desc:"Change active chorus. Each ally within 5 shifts 1 as free action. Allies gain new chorus benefit until end of next turn."},
+      {name:"Bright One's Gift",action:"Minor",range:"Ranged 5",keywords:"Divine, Healing",desc:"One ally gains current chorus benefit without you using a power. If ally is bloodied, also gains temp HP = CHA mod."}
+    ],
+    daily: [
+      {name:"Canticle of the Twin Bright Ones",action:"Standard",range:"Close burst 3",keywords:"Divine, Healing, Radiant, Fire",desc:"Each enemy and ally. CHA vs Will. Hit: 2d8 + CHA radiant+fire. Miss: Half. Each ally spends surge + CHA mod HP. Choose one Uzotol + one Ugyn chorus; all allies gain both until end of encounter. Each ally makes a save."},
+      {name:"Symphony of the Twin Bright Ones",action:"Standard",range:"Close burst 5",keywords:"Divine, Healing, Radiant, Fire",desc:"Each ally in burst spends healing surge + 2d6 HP. Each enemy takes 2d6 + CHA radiant+fire. All allies gain two chorus benefits of your choice for rest of encounter. Sustain minor: one ally in burst heals CHA mod HP."},
+      {name:"Bright One's Revelation",action:"Standard",range:"Ranged 10",keywords:"Divine, Radiant, Fire, Implement",desc:"CHA vs Will. Hit: 3d8 + CHA radiant+fire, dazed (save ends). All allies within 5 sq gain chorus of your choice until end of encounter. Miss: Half damage, allies still gain chorus benefit."}
+    ]
+  }
+};
+
+const DEITIES = ["Astridhe (Star-Mother)","Dyhas (Souls)","Onos (Oaths & Thresholds)","Mithar (War, Dead)","Pheksus (Trickster)","Phiznir (Justice & Mercy)","Uzotol (Creative Invention)","Ugyn (Questions & Consequences)","Twin Bright Ones"];
+const ABILITY_NAMES = ["str","con","dex","int","wis","cha"];
+const ABILITY_LABELS = {str:"STR",con:"CON",dex:"DEX",int:"INT",wis:"WIS",cha:"CHA"};
+const ABILITY_FULL = {str:"Strength",con:"Constitution",dex:"Dexterity",int:"Intelligence",wis:"Wisdom",cha:"Charisma"};
+const STANDARD_ARRAY = [16,14,13,12,11,10];
+const LEVEL_PROGRESS = [
+  {level:1,feats:1,atwills:2,encounter:1,utility:0,daily:1,gained:"Start with your core class package."},
+  {level:2,feats:2,atwills:2,encounter:1,utility:1,daily:1,gained:"+1 feat, +1 utility power."},
+  {level:3,feats:2,atwills:2,encounter:2,utility:1,daily:1,gained:"+1 encounter power."},
+  {level:4,feats:3,atwills:2,encounter:2,utility:1,daily:1,gained:"+1 feat."},
+  {level:5,feats:3,atwills:2,encounter:2,utility:1,daily:2,gained:"+1 daily power."},
+  {level:6,feats:4,atwills:2,encounter:2,utility:2,daily:2,gained:"+1 feat, +1 utility power."},
+  {level:7,feats:4,atwills:2,encounter:3,utility:2,daily:2,gained:"+1 encounter power."},
+  {level:8,feats:5,atwills:2,encounter:3,utility:2,daily:2,gained:"+1 feat."},
+  {level:9,feats:5,atwills:2,encounter:3,utility:2,daily:3,gained:"+1 daily power."},
+  {level:10,feats:6,atwills:2,encounter:3,utility:3,daily:3,gained:"+1 feat, +1 utility power."}
+];
+
+// STATE
+let selectedSpecies=null, selectedSecondary=null, selectedClass=null;
+let selectedFeats=[], selectedSkills=[];
+let selectedPowers={atwill:[],encounter:null,utility:null,daily:null};
+let abilityScores={};
+let scoreMethod="array";
+const PT_TOTAL=28, PT_MIN=8, PT_MAX=18;
+const PT_COST={8:0,9:1,10:2,11:3,12:4,13:5,14:6,15:8,16:10,17:13,18:16};
+
+function mod(s){return Math.floor((s-10)/2)}
+function describeSpeciesAbilityBonuses(sp,sec){const p=ABILITY_LABELS[sp.primaryAbility];const c=sp.secondaryChoices.map(a=>ABILITY_LABELS[a]).join(" or ");let t=`+2 ${p}; choose one +1 ${c}`;if(sec&&sp.secondaryChoices.includes(sec))t+=` — selected +1 ${ABILITY_LABELS[sec]}`;return t}
+function getSpeciesAbilityBonuses(){const b={};if(!selectedSpecies)return b;const sp=SPECIES[selectedSpecies];b[sp.primaryAbility]=(b[sp.primaryAbility]||0)+2;if(selectedSecondary&&sp.secondaryChoices.includes(selectedSecondary))b[selectedSecondary]=(b[selectedSecondary]||0)+1;return b}
+
+function renderSecondaryAbilityChoice(){const r=document.getElementById("secondaryAbilityRow");const s=document.getElementById("secondaryAbilitySelect");if(!selectedSpecies){selectedSecondary=null;r.style.display="none";s.innerHTML="";return}const sp=SPECIES[selectedSpecies];r.style.display="flex";s.innerHTML='<option value="">— Select Secondary Ability —</option>'+sp.secondaryChoices.map(a=>`<option value="${a}">${ABILITY_LABELS[a]} — ${ABILITY_FULL[a]}</option>`).join("");if(selectedSecondary&&sp.secondaryChoices.includes(selectedSecondary))s.value=selectedSecondary;else{selectedSecondary=null;s.value=""}}
+
+function renderLevelProgression(){const el=document.getElementById("levelProgression");let h='<div class="progress-note">Level 4 is the creator target, but this table shows the normal progression from level 1 through 10.</div>';h+='<table class="progress-table"><thead><tr><th>Level</th><th>Feats</th><th>At-Wills</th><th>Encounter</th><th>Utility</th><th>Daily</th><th>Gain at This Level</th></tr></thead><tbody>';LEVEL_PROGRESS.forEach(r=>{const cls=r.level===4?' class="level-4"':'';h+=`<tr${cls}><td>${r.level}</td><td>${r.feats}</td><td>${r.atwills}</td><td>${r.encounter}</td><td>${r.utility}</td><td>${r.daily}</td><td>${r.gained}</td></tr>`});h+='</tbody></table>';el.innerHTML=h}
+
+function renderSpeciesInfo(){const el=document.getElementById("speciesInfo");if(!selectedSpecies){el.innerHTML="";return}const sp=SPECIES[selectedSpecies];let i=`<strong>${sp.name}</strong> — Speed ${sp.speed}${sp.specialSpeed?', '+sp.specialSpeed:''}<br><strong>Ability Bonuses:</strong> ${describeSpeciesAbilityBonuses(sp,selectedSecondary)}<br>Languages: ${sp.languages.join(', ')}<br>Proficiencies: ${sp.proficiencies.join(', ')}<br><strong>Features:</strong><ul class="feature-list">`;sp.features.forEach(f=>{i+=`<li><span class="fname">${f.name}</span><span class="fdesc">— ${f.desc}</span></li>`});i+='</ul>';el.innerHTML=i}
+
+function renderSkills(){const el=document.getElementById("skillList");if(!selectedClass){el.innerHTML='<div style="color:#888">Select a class to choose trained skills.</div>';return}const cl=CLASSES[selectedClass];let h=`<div class="skill-count">Pick 3 from: ${cl.trainedSkills.join(', ')}</div>`;cl.trainedSkills.forEach(s=>{let sel=selectedSkills.includes(s)?' selected':'';h+=`<div class="skill-card${sel}" onclick="toggleSkill('${s}')"><span class="sname">${s}</span> <span class="sabil">(${ABILITY_ABBREV[SKILLS.find(sk=>sk.name===s).ability]})</span></div>`});el.innerHTML=h}
+
+function toggleSkill(name){if(selectedSkills.includes(name)){selectedSkills=selectedSkills.filter(s=>s!==name)}else if(selectedSkills.length<3){selectedSkills.push(name)}renderSkills();updateSheet()}
+
+function init(){
+  const sg=document.getElementById("speciesGroup");
+  Object.keys(SPECIES).forEach(k=>{sg.innerHTML+=`<label><input type="radio" name="species" value="${k}" onchange="selectSpecies('${k}')"><span>${SPECIES[k].name}</span></label>`});
+  const cg=document.getElementById("classGroup");
+  Object.keys(CLASSES).forEach(k=>{cg.innerHTML+=`<label><input type="radio" name="class" value="${k}" onchange="selectClass('${k}')"><span>${CLASSES[k].name}</span></label>`});
+  ABILITY_NAMES.forEach(a=>{abilityScores[a]=10});
+  renderAbilityInputs();
+  const ds=document.getElementById("deitySelect");ds.innerHTML='<option value="">— Select Deity —</option>';DEITIES.forEach(d=>{ds.innerHTML+=`<option value="${d}">${d}</option>`});
+  renderLevelProgression();renderFeats();renderPowers();renderSecondaryAbilityChoice();renderSkills();
+  updateAll();
+}
+
+function selectSpecies(key){selectedSpecies=key;const sp=SPECIES[key];if(!sp.secondaryChoices.includes(selectedSecondary))selectedSecondary=null;renderSecondaryAbilityChoice();renderFeats();updateAll()}
+function selectSecondaryAbility(v){const sp=selectedSpecies?SPECIES[selectedSpecies]:null;selectedSecondary=sp&&sp.secondaryChoices.includes(v)?v:null;updateAll()}
+function selectClass(key){selectedClass=key;const cl=CLASSES[key];let i=`<strong>${cl.name}</strong> — ${cl.role}, ${cl.source} | Key: ${ABILITY_FULL[cl.keyAbility].toUpperCase()}<br>HP at 1st: ${cl.hpBase} + CON score | Surges: ${cl.surges} + CON mod<br>Defenses: Fort +${cl.defenses.fort}, Ref +${cl.defenses.ref}, Will +${cl.defenses.will}<br>Armor: ${cl.armor.join(', ')}<br>Weapons: ${cl.weapons.join(', ')}<br>Linked Deity: ${cl.deity}<br>Trained Skills: ${cl.trainedSkills.join(', ')} (pick 3)<br><strong>Features:</strong><ul class="feature-list">`;cl.features.forEach(f=>{i+=`<li><span class="fname">${f.name}</span><span class="fdesc">— ${f.desc}</span></li>`});i+='</ul>';document.getElementById("classInfo").innerHTML=i;
+  const dm={heartsworn:"Astridhe (Star-Mother)",soulkeeper:"Dyhas (Souls)",oathbound:"Onos (Oaths & Thresholds)",warsinger:"Mithar (War, Dead)",trickweaver:"Pheksus (Trickster)",balancejudge:"Phiznir (Justice & Mercy)",sparkwright:"Uzotol (Creative Invention)",consecrator:"Ugyn (Questions & Consequences)",brightone:"Twin Bright Ones"};
+  if(dm[key])document.getElementById("deitySelect").value=dm[key];
+  renderFeats();renderSkills();selectedPowers={atwill:[],encounter:null,utility:null,daily:null};renderPowers();updateAll()}
+
+function setAbility(ab,val){abilityScores[ab]=parseInt(val)||10;updateAll()}
+function switchScoreMethod(m){scoreMethod=m;document.getElementById("arrayNote").style.display=m==='array'?'':'none';document.getElementById("pointbuyNote").style.display=m==='pointbuy'?'':'none';if(m==='pointbuy')ABILITY_NAMES.forEach(a=>{abilityScores[a]=10});renderAbilityInputs();updateAll()}
+
+function renderAbilityInputs(){const ag=document.getElementById("abilityGrid");ag.innerHTML="";if(scoreMethod==='array'){ABILITY_NAMES.forEach(a=>{ag.innerHTML+=`<div class="ability-box"><div class="name">${ABILITY_FULL[a]}</div><input type="number" id="ab_${a}" value="${abilityScores[a]||10}" min="3" max="20" onchange="setAbility('${a}',this.value)"><div class="score" id="ab_total_${a}">10</div><div class="mod" id="ab_mod_${a}">+0</div><div class="racial" id="ab_racial_${a}"></div></div>`})}else{ABILITY_NAMES.forEach(a=>{const v=abilityScores[a]||10;const c=PT_COST[v]||0;ag.innerHTML+=`<div class="ability-box"><div class="name">${ABILITY_FULL[a]}</div><div class="pb-btns"><button class="pb-btn" onclick="pbAdjust('${a}',-1)" ${v<=PT_MIN?'disabled':''}>-</button><span style="font-size:1.3em;font-weight:700;min-width:28px;text-align:center" id="pb_val_${a}">${v}</span><button class="pb-btn" onclick="pbAdjust('${a}',1)" ${v>=PT_MAX?'disabled':''}>+</button></div><div class="score" id="ab_total_${a}">10</div><div class="mod" id="ab_mod_${a}">+0</div><div class="racial" id="ab_racial_${a}"></div><div class="pb-cost" id="pb_cost_${a}">Cost: ${c}</div></div>`});updatePointBuyDisplay()}}
+
+function pbAdjust(ab,d){const cur=abilityScores[ab]||10;const next=cur+d;if(next<PT_MIN||next>PT_MAX)return;const spent=getPointBuySpent();if(spent-PT_COST[cur]+PT_COST[next]>PT_TOTAL)return;abilityScores[ab]=next;renderAbilityInputs();updateAll()}
+function getPointBuySpent(){let t=0;ABILITY_NAMES.forEach(a=>{t+=PT_COST[abilityScores[a]||10]||0});return t}
+function updatePointBuyDisplay(){if(scoreMethod!=='pointbuy')return;const spent=getPointBuySpent();const rem=PT_TOTAL-spent;document.getElementById("pointsRemaining").textContent=`Points remaining: ${rem}/${PT_TOTAL}`;ABILITY_NAMES.forEach(a=>{const v=abilityScores[a]||10;const c=PT_COST[v]||0;const ve=document.getElementById(`pb_val_${a}`);const ce=document.getElementById(`pb_cost_${a}`);if(ve)ve.textContent=v;if(ce)ce.textContent=`Cost: ${c}`})}
+
+function updateAll(){
+  renderSpeciesInfo();updatePointBuyDisplay();
+  const rb=getSpeciesAbilityBonuses();
+  ABILITY_NAMES.forEach(a=>{let base=abilityScores[a]||10;let racial=rb[a]||0;let total=base+racial;document.getElementById(`ab_total_${a}`).textContent=total;document.getElementById(`ab_mod_${a}`).textContent=(mod(total)>=0?'+':'')+mod(total);document.getElementById(`ab_racial_${a}`).textContent=racial?`(+${racial} racial)`:''});
+  updateDerived();updateSheet();
+}
+
+function updateDerived(){
+  const dg=document.getElementById("derivedGrid");
+  if(!selectedClass){dg.innerHTML='<div style="color:#888">Select a class to see derived stats.</div>';return}
+  const cl=CLASSES[selectedClass];const sp=selectedSpecies?SPECIES[selectedSpecies]:null;const rb=getSpeciesAbilityBonuses();
+  let cs=(abilityScores.con||10)+(rb.con||0),cm=mod(cs);
+  let ds=(abilityScores.dex||10)+(rb.dex||0),is=(abilityScores.int||10)+(rb.int||0);
+  let ws=(abilityScores.wis||10)+(rb.wis||0),ss=(abilityScores.str||10)+(rb.str||0);
+  let chs=(abilityScores.cha||10)+(rb.cha||0);
+  let hp=cl.hpBase+cs, blood=Math.floor(hp/2), surges=cl.surges+cm, sv=Math.floor(hp/4);
+  let fort=10+Math.max(mod(ss),mod(cs))+cl.defenses.fort;
+  let ref=10+Math.max(mod(ds),mod(is))+cl.defenses.ref;
+  let will=10+Math.max(mod(ws),mod(chs))+cl.defenses.will;
+  let ac=10+cl.defenses.ref+Math.max(mod(ds),mod(is));
+  dg.innerHTML=`<div class="derived-item"><div class="label">Max HP</div><div class="value">${hp}</div></div><div class="derived-item"><div class="label">Bloodied</div><div class="value">${blood}</div></div><div class="derived-item"><div class="label">Healing Surges</div><div class="value">${surges}</div></div><div class="derived-item"><div class="label">Surge Value</div><div class="value">${sv}</div></div><div class="derived-item"><div class="label">AC</div><div class="value">${ac}</div></div><div class="derived-item"><div class="label">Fortitude</div><div class="value">${fort}</div></div><div class="derived-item"><div class="label">Reflex</div><div class="value">${ref}</div></div><div class="derived-item"><div class="label">Will</div><div class="value">${will}</div></div><div class="derived-item"><div class="label">Initiative</div><div class="value">+${mod(ds)}</div></div><div class="derived-item"><div class="label">Speed</div><div class="value">${sp?sp.speed:6}${sp&&sp.specialSpeed?' ('+sp.specialSpeed+')':''}</div></div>`;
+}
+
+function renderFeats(){
+  const fl=document.getElementById("featList");let h='';
+  FEATS.forEach(f=>{const cm=f.matchClasses||[];const sm=f.matchSpecies||[];let ml='';if(selectedClass||selectedSpecies){let r=[];if(selectedClass&&cm.includes(selectedClass))r.push(CLASSES[selectedClass].name);if(selectedSpecies&&sm.includes(selectedSpecies))r.push(SPECIES[selectedSpecies].name);ml=r.length?`<div class="fmatch">Matches: ${r.join(', ')}</div>`:`<div class="fmatch" style="color:#666">No match</div>`}let sel=selectedFeats.includes(f.id)?' selected':'';h+=`<div class="feat-card${sel}" onclick="selectFeat('${f.id}')"><div class="ftitle">${f.name}</div><div class="fprereq">${f.tier} ${f.origin} — ${f.prereq}</div><div class="fdesc">${f.desc}</div>${ml}</div>`});fl.innerHTML=h}
+
+function selectFeat(id){if(selectedFeats.includes(id))selectedFeats=selectedFeats.filter(f=>f!==id);else if(selectedFeats.length<3)selectedFeats.push(id);renderFeats();updateSheet()}
+
+function renderPowers(){
+  const pl=document.getElementById("powerList");
+  if(!selectedClass||!POWERS[selectedClass]){pl.innerHTML='<div style="color:#888">Select a class to see powers.</div>';return}
+  const pw=POWERS[selectedClass];let h='';
+  h+='<div class="power-section">At-Will Powers (pick 2)</div>';
+  pw.atwill.forEach((p,i)=>{let sel=selectedPowers.atwill.includes(i)?' selected':'';h+=`<div class="power-card${sel}" onclick="toggleAtwill(${i})"><div class="ptitle">${p.name} <span class="pkeywords">(${p.keywords})</span></div><div class="pmeta"><strong>${p.action} | ${p.range}</strong></div><div class="pdesc">${p.desc}</div></div>`});
+  h+='<div class="power-section">Encounter Powers (pick 1)</div>';
+  pw.encounter.forEach((p,i)=>{let sel=selectedPowers.encounter===i?' selected':'';h+=`<div class="power-card${sel}" onclick="selectSingle('encounter',${i})"><div class="ptitle">${p.name} <span class="pkeywords">(${p.keywords})</span></div><div class="pmeta"><strong>${p.action} | ${p.range}</strong></div><div class="pdesc">${p.desc}</div></div>`});
+  h+='<div class="power-section">Utility Powers (pick 1)</div>';
+  pw.utility.forEach((p,i)=>{let sel=selectedPowers.utility===i?' selected':'';h+=`<div class="power-card${sel}" onclick="selectSingle('utility',${i})"><div class="ptitle">${p.name} <span class="pkeywords">(${p.keywords})</span></div><div class="pmeta"><strong>${p.action} | ${p.range}</strong></div><div class="pdesc">${p.desc}</div></div>`});
+  h+='<div class="power-section">Daily Powers (pick 1)</div>';
+  pw.daily.forEach((p,i)=>{let sel=selectedPowers.daily===i?' selected':'';h+=`<div class="power-card${sel}" onclick="selectSingle('daily',${i})"><div class="ptitle">${p.name} <span class="pkeywords">(${p.keywords})</span></div><div class="pmeta"><strong>${p.action} | ${p.range}</strong></div><div class="pdesc">${p.desc}</div></div>`});
+  pl.innerHTML=h;
+}
+
+function toggleAtwill(i){const idx=selectedPowers.atwill.indexOf(i);if(idx>=0)selectedPowers.atwill.splice(idx,1);else if(selectedPowers.atwill.length<2)selectedPowers.atwill.push(i);renderPowers();updateSheet()}
+function selectSingle(type,i){selectedPowers[type]=selectedPowers[type]===i?null:i;renderPowers();updateSheet()}
+
+function getFinalScores(){
+  const rb=getSpeciesAbilityBonuses();const fs={};
+  ABILITY_NAMES.forEach(a=>{fs[a]=(abilityScores[a]||10)+(rb[a]||0)});
+  return fs;
+}
+
+function updateSheet(){
+  const sp=selectedSpecies?SPECIES[selectedSpecies]:null;
+  const cl=selectedClass?CLASSES[selectedClass]:null;
+  const rb=getSpeciesAbilityBonuses();
+  const fs=getFinalScores();
+  const cs=fs.con, ds=fs.dex, is=fs.int, ws=fs.wis, ss=fs.str, chs=fs.cha;
+  const level=1;
+  let hp=cl?cl.hpBase+cs:0, blood=Math.floor(hp/2), surges=cl?cl.surges+mod(cs):0, sv=Math.floor(hp/4);
+  let fort=cl?10+Math.max(mod(ss),mod(cs))+cl.defenses.fort:0;
+  let ref=cl?10+Math.max(mod(ds),mod(is))+cl.defenses.ref:0;
+  let will=cl?10+Math.max(mod(ws),mod(chs))+cl.defenses.will:0;
+  let ac=cl?10+cl.defenses.ref+Math.max(mod(ds),mod(is)):0;
+  let init=mod(ds);
+  let speed=sp?sp.speed:6;
+  let speedSpec=sp&&sp.specialSpeed?', '+sp.specialSpeed:'';
+
+  // Build sheet HTML
+  let h='<div class="sheet-page"><div class="sheet-banner"><span class="sheet-banner-title">ARCHADES</span><span class="sheet-banner-subtitle">CHARACTER SHEET</span></div>';
+  // Header row 1
+  h+='<div class="sheet-hrow"><div class="sheet-field" style="flex:3"><div class="sheet-field-label">Character Name</div><div class="sheet-field-value" style="font-size:16px">'+(document.getElementById("charName").value||'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:50px"><div class="sheet-field-label">Level</div><div class="sheet-field-value">'+level+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:120px"><div class="sheet-field-label">Species</div><div class="sheet-field-value">'+(sp?sp.name:'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:140px"><div class="sheet-field-label">Class</div><div class="sheet-field-value">'+(cl?cl.name:'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:100px"><div class="sheet-field-label">Alignment</div><div class="sheet-field-value">'+(document.getElementById("alignSelect").value||'—')+'</div></div></div>';
+  // Header row 2
+  h+='<div class="sheet-hrow"><div class="sheet-field" style="max-width:60px"><div class="sheet-field-label">Size</div><div class="sheet-field-value">Medium</div></div>';
+  h+='<div class="sheet-field" style="max-width:50px"><div class="sheet-field-label">Age</div><div class="sheet-field-value">—</div></div>';
+  h+='<div class="sheet-field" style="max-width:60px"><div class="sheet-field-label">Gender</div><div class="sheet-field-value">'+(document.getElementById("gender").value||'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:60px"><div class="sheet-field-label">Height</div><div class="sheet-field-value">'+(document.getElementById("height").value||'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:60px"><div class="sheet-field-label">Weight</div><div class="sheet-field-value">'+(document.getElementById("weight").value||'—')+'</div></div>';
+  h+='<div class="sheet-field" style="max-width:120px"><div class="sheet-field-label">Deity</div><div class="sheet-field-value">'+(document.getElementById("deitySelect").value||'—')+'</div></div></div>';
+  // Stat bar
+  h+='<div class="sheet-statbar"><div class="sheet-statbox"><div class="sv">'+(init>=0?'+':'')+init+'</div><div class="sl">Initiative</div></div><div class="sheet-statbox"><div class="sv">'+speed+'</div><div class="sl">Speed'+speedSpec+'</div></div><div class="sheet-statbox"><div class="sv">1</div><div class="sl">Action Points</div></div><div class="sheet-statbox"><div class="sv">'+(cl?cl.surges+mod(cs):'—')+'</div><div class="sl">Healing Surges</div></div></div>';
+  // Three columns
+  h+='<div class="sheet-3col">';
+  // LEFT COLUMN
+  h+='<div>';
+  // HP box
+  h+='<div class="sheet-box"><div class="sheet-secthdr">Hit Points</div><div class="sheet-hp-grid"><div class="sheet-hp-item"><div class="hv">'+(cl?hp:'—')+'</div><div class="hl">Max HP</div></div><div class="sheet-hp-item"><div class="hv">'+(cl?blood:'—')+'</div><div class="hl">Bloodied</div></div><div class="sheet-hp-item"><div class="hv">'+(cl?sv:'—')+'</div><div class="hl">Surge Value</div></div></div><div class="sheet-hp-row"><div><div class="hl">Current HP</div><div class="hv"> </div></div><div><div class="hl">Current Surges</div><div class="hv"> </div></div></div><div style="padding:8px;font-size:9px"><b>Second Wind</b> &#9744; &nbsp;&nbsp; <b>Death Saves</b> &#9744; &#9744; &#9744;</div></div>';
+  // Ability Scores
+  h+='<div class="sheet-box"><div class="sheet-secthdr">Ability Scores</div>';
+  ABILITY_NAMES.forEach(a=>{h+=`<div class="sheet-abil-row"><div class="sheet-abil-box">${abilityScores[a]||10}</div><div class="sheet-abil-name">${ABILITY_ABBREV[a]}</div><div class="sheet-abil-box">${mod(fs[a])>=0?'+'+mod(fs[a]):mod(fs[a])}</div></div>`});
+  h+='</div>';
+  // Defenses
+  h+='<div class="sheet-box"><div class="sheet-secthdr">Defenses</div><div class="sheet-def-list">';
+  [{n:'AC',v:ac,s:'DEX/INT'},{n:'FORT',v:fort,s:'STR/CON'},{n:'REF',v:ref,s:'DEX/INT'},{n:'WILL',v:will,s:'WIS/CHA'}].forEach(d=>{h+=`<div class="sheet-def-item"><div class="sheet-def-circle">${cl?d.v:'—'}</div><div class="sheet-def-name">${d.n}</div><div class="sheet-def-src">${d.s}</div></div>`});
+  h+='</div></div>';
+  // Features and Feats
+  let featHtml='';
+  if(selectedFeats.length){featHtml=selectedFeats.map(id=>{const f=FEATS.find(x=>x.id===id);return `<span class="sfn">${f.name}</span>`}).join(', ')}else{featHtml='<span class="sheet-empty">—</span>'}
+  h+=`<div class="sheet-box"><div class="sheet-secthdr">Features and Feats</div><div class="sheet-feat-list">${featHtml}</div></div>`;
+  // Equipment
+  let eqHtml='';
+  if(cl){eqHtml=`<div><b>Armor:</b> ${cl.armor.join(', ')}</div><div><b>Weapons:</b> ${cl.weapons.join(', ')}</div>`}else{eqHtml='<span class="sheet-empty">—</span>'}
+  h+=`<div class="sheet-box"><div class="sheet-secthdr">Equipment</div><div class="sheet-feat-list">${eqHtml}</div></div>`;
+  h+='</div>';
+  // MIDDLE COLUMN: Skills
+  h+='<div><div class="sheet-box"><div class="sheet-secthdr">Skills</div><table class="sheet-skills-table"><thead><tr><th class="sk-bonus">Bonus</th><th class="sk-name">Skill</th><th class="sk-abil">Abil</th></tr></thead><tbody>';
+  SKILLS.forEach(sk=>{const trained=selectedSkills.includes(sk.name);const abilMod=mod(fs[sk.ability]);const total=trained?abilMod+5+Math.floor(level/2):abilMod+Math.floor(level/2);h+=`<tr class="${trained?'sk-trained':''}"><td class="sk-bonus">${total>=0?'+':''}${total}</td><td class="sk-name">${sk.name}${trained?' &#9745;':''}</td><td class="sk-abil">${ABILITY_ABBREV[sk.ability]}</td></tr>`});
+  h+='</tbody></table></div></div>';
+  // RIGHT COLUMN: Portrait + Powers + Languages
+  h+='<div><div class="sheet-portrait">Character Portrait</div>';
+  // Powers lists
+  if(cl&&POWERS[selectedClass]){
+    const pw=POWERS[selectedClass];
+    [{t:'At-Will Powers',k:'atwill'},{t:'Encounter Powers',k:'encounter'},{t:'Daily Powers',k:'daily'},{t:'Utility Powers',k:'utility'}].forEach(sec=>{
+      let pHtml='';
+      if(sec.k==='atwill'){pHtml=selectedPowers.atwill.map(i=>`<div class="spl">${pw.atwill[i].name}</div>`).join('')}
+      else{const idx=selectedPowers[sec.k];pHtml=idx!==null?`<div class="spl">${pw[sec.k][idx].name}</div>`:''}
+      h+=`<div class="sheet-box"><div class="sheet-secthdr">${sec.t}</div><div class="sheet-power-list">${pHtml||'<span class="sheet-empty">—</span>'}</div></div>`;
+    });
+  }else{
+    ['At-Will Powers','Encounter Powers','Daily Powers','Utility Powers'].forEach(t=>{h+=`<div class="sheet-box"><div class="sheet-secthdr">${t}</div><div class="sheet-empty">—</div></div>`});
+  }
+  // Languages
+  h+=`<div class="sheet-box"><div class="sheet-secthdr">Languages Known</div><div class="sheet-langs">${sp?sp.languages.join(', '):'Common'}</div></div>`;
+  h+='</div></div>'; // end 3col
+  // Features row
+  let sfHtml=sp?sp.features.map(f=>`<div class="sheet-feat-list"><span class="sfn">${f.name}</span> — ${f.desc}</div>`).join(''):'<span class="sheet-empty">—</span>';
+  let cfHtml=cl?cl.features.map(f=>`<div class="sheet-feat-list"><span class="sfn">${f.name}</span> — ${f.desc}</div>`).join(''):'<span class="sheet-empty">—</span>';
+  h+=`<div class="sheet-features-row"><div class="sheet-box"><div class="sheet-secthdr">Species Features</div><div class="sheet-feat-list">${sfHtml}</div></div><div class="sheet-box"><div class="sheet-secthdr">Class Features</div><div class="sheet-feat-list">${cfHtml}</div></div></div>`;
+  h+='</div>'; // end page 1
+
+  // PAGE 2: Power descriptions
+  h+='<div class="sheet-page sheet-page-break"><div class="sheet-banner"><span class="sheet-banner-title" style="font-size:16px">'+(document.getElementById("charName").value||'Unnamed Hero')+' — Power Descriptions</span><span class="sheet-banner-subtitle" style="font-size:12px">Level '+level+' '+(cl?cl.name:'')+'</span></div><div>';
+  if(cl&&POWERS[selectedClass]){
+    const pw=POWERS[selectedClass];
+    const allPowers=[];
+    selectedPowers.atwill.forEach(i=>allPowers.push({p:pw.atwill[i],type:'atwill'}));
+    if(selectedPowers.encounter!==null)allPowers.push({p:pw.encounter[selectedPowers.encounter],type:'encounter'});
+    if(selectedPowers.daily!==null)allPowers.push({p:pw.daily[selectedPowers.daily],type:'daily'});
+    if(selectedPowers.utility!==null)allPowers.push({p:pw.utility[selectedPowers.utility],type:'utility'});
+    allPowers.forEach(item=>{
+      const p=item.p;const cls=item.type;
+      h+=`<div class="sheet-pwr-card"><div class="sheet-pwr-hdr sheet-pwr-${cls}"><span class="sheet-pwr-name">${p.name}</span><span class="sheet-pwr-meta">${item.type} · ${p.action} · ${p.range}</span></div><div class="sheet-pwr-body">`;
+      if(p.keywords)h+=`<div><b>Keywords:</b> ${p.keywords}</div>`;
+      if(p.action)h+=`<div><b>Action:</b> ${p.action}</div>`;
+      if(p.range)h+=`<div><b>Range:</b> ${p.range}</div>`;
+      if(p.desc)h+=`<div><b>Effect:</b> ${p.desc}</div>`;
+      h+='</div></div>';
+    });
+    if(allPowers.length===0)h+='<div class="sheet-empty">No powers selected.</div>';
+  }else{
+    h+='<div class="sheet-empty">Select a class and powers to see descriptions.</div>';
+  }
+  h+='</div></div>';
+  document.getElementById("sheet").innerHTML=h;
+}
+
+function printSheet(){updateSheet();window.print()}
+function viewSheet(){updateSheet();document.body.classList.add("sheet-preview");document.getElementById("sheetActions").style.display="block"}
+function closeSheet(){document.body.classList.remove("sheet-preview");document.getElementById("sheetActions").style.display="none"}
+
+function exportJSON(){
+  const data={name:document.getElementById("charName").value,player:document.getElementById("playerName").value,species:selectedSpecies,secondary:selectedSecondary,class:selectedClass,abilityScores,scoreMethod,selectedFeats,selectedSkills,selectedPowers,deity:document.getElementById("deitySelect").value,alignment:document.getElementById("alignSelect").value,gender:document.getElementById("gender").value,height:document.getElementById("height").value,weight:document.getElementById("weight").value};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(data.name||"character")+".json";a.click()
+}
+
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.name)document.getElementById("charName").value=d.name;
+      if(d.player)document.getElementById("playerName").value=d.player;
+      if(d.species){selectedSpecies=d.species;document.querySelector(`input[name="species"][value="${d.species}"]`).checked=true;renderSecondaryAbilityChoice()}
+      if(d.secondary){selectedSecondary=d.secondary;document.getElementById("secondaryAbilitySelect").value=d.secondary}
+      if(d.class){selectedClass=d.class;document.querySelector(`input[name="class"][value="${d.class}"]`).checked=true;selectClass(d.class)}
+      if(d.abilityScores)abilityScores=d.abilityScores;
+      if(d.scoreMethod){scoreMethod=d.scoreMethod;document.querySelector(`input[name="scoreMethod"][value="${d.scoreMethod}"]`).checked=true;renderAbilityInputs()}
+      if(d.selectedFeats)selectedFeats=d.selectedFeats;
+      if(d.selectedSkills)selectedSkills=d.selectedSkills;
+      if(d.selectedPowers)selectedPowers=d.selectedPowers;
+      if(d.deity)document.getElementById("deitySelect").value=d.deity;
+      if(d.alignment)document.getElementById("alignSelect").value=d.alignment;
+      if(d.gender)document.getElementById("gender").value=d.gender;
+      if(d.height)document.getElementById("height").value=d.height;
+      if(d.weight)document.getElementById("weight").value=d.weight;
+      renderFeats();renderSkills();renderPowers();updateAll();
+    }catch(err){alert("Invalid JSON file.")}
+  };
+  r.readAsText(file);
+}
+
+function resetAll(){
+  selectedSpecies=null;selectedSecondary=null;selectedClass=null;selectedFeats=[];selectedSkills=[];
+  selectedPowers={atwill:[],encounter:null,utility:null,daily:null};
+  ABILITY_NAMES.forEach(a=>{abilityScores[a]=10});
+  scoreMethod="array";
+  document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+  document.getElementById("charName").value="";document.getElementById("playerName").value="";
+  document.getElementById("gender").value="";document.getElementById("height").value="";document.getElementById("weight").value="";
+  document.getElementById("deitySelect").value="";document.getElementById("alignSelect").value="";
+  document.querySelector('input[name="scoreMethod"][value="array"]').checked=true;
+  renderAbilityInputs();renderSecondaryAbilityChoice();renderFeats();renderSkills();renderPowers();updateAll();
+}
+
+init();
+</script>
+</body>
+</html>
