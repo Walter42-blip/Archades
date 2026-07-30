@@ -155,7 +155,7 @@ body.sheet-preview #sheet{display:block!important}
 </head>
 <body>
 <div class="container">
-<h1>Archades Character Creator<small>D&D 4th Edition — The Oath's Choice</small></h1>
+<h1>Archades Character Creator</h1>
 
 <div id="creator">
 <div class="step">
@@ -386,7 +386,7 @@ const SPECIES = {
 const CLASSES = {
   heartsworn: {
     name: "Heartsworn of Astridhe", role: "Leader", source: "Divine", keyAbility: "cha",
-    hpBase: 6, surges: 7, defenses: { fort: 1, ref: 0, will: 1 },
+    hpBase: 12, surges: 7, defenses: { fort: 1, ref: 0, will: 1 },
     armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (heavy blade, spear)"],
     deity: "Astridhe", trainedSkills: ["Diplomacy", "Heal", "Insight", "Religion"],
@@ -398,7 +398,7 @@ const CLASSES = {
   },
   soulkeeper: {
     name: "Soul Keeper of Dyhas", role: "Leader", source: "Divine", keyAbility: "wis",
-    hpBase: 6, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    hpBase: 12, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
     armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (spear, staff)"],
     deity: "Dyhas", trainedSkills: ["Heal", "History", "Insight", "Religion"],
@@ -410,7 +410,7 @@ const CLASSES = {
   },
   oathbound: {
     name: "Oathbound of Onos", role: "Defender", source: "Divine", keyAbility: "str",
-    hpBase: 8, surges: 8, defenses: { fort: 2, ref: 0, will: 1 },
+    hpBase: 15, surges: 8, defenses: { fort: 2, ref: 0, will: 1 },
     armor: ["Cloth", "Leather", "Hide", "Chainmail", "Scale", "Plate", "Shield"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (all)"],
     deity: "Onos", trainedSkills: ["Athletics", "Endurance", "Intimidate", "Religion"],
@@ -422,7 +422,7 @@ const CLASSES = {
   },
   warsinger: {
     name: "War Singer of Mithar", role: "Striker", source: "Divine", keyAbility: "str",
-    hpBase: 5, surges: 7, defenses: { fort: 2, ref: 1, will: 0 },
+    hpBase: 12, surges: 7, defenses: { fort: 2, ref: 1, will: 0 },
     armor: ["Cloth", "Leather", "Hide", "Chainmail"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (all)", "Military ranged (crossbow)"],
     deity: "Mithar (Dead)", trainedSkills: ["Athletics", "Endurance", "Intimidate", "Streetwise"],
@@ -434,7 +434,7 @@ const CLASSES = {
   },
   trickweaver: {
     name: "Trick Weaver of Pheksus", role: "Controller", source: "Divine", keyAbility: "cha",
-    hpBase: 5, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
+    hpBase: 10, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
     armor: ["Cloth", "Leather"],
     weapons: ["Simple melee", "Simple ranged", "Military ranged (hand crossbow, sling)"],
     deity: "Pheksus", trainedSkills: ["Bluff", "Stealth", "Streetwise", "Thievery"],
@@ -446,7 +446,7 @@ const CLASSES = {
   },
   balancejudge: {
     name: "Balance Judge of Phiznir", role: "Controller", source: "Divine", keyAbility: "wis",
-    hpBase: 5, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    hpBase: 10, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
     armor: ["Cloth", "Leather", "Hide", "Chainmail", "Shield"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (hammer, mace)"],
     deity: "Phiznir", trainedSkills: ["Diplomacy", "Heal", "Insight", "Religion"],
@@ -458,7 +458,7 @@ const CLASSES = {
   },
   sparkwright: {
     name: "Sparkwright of Uzotol", role: "Controller", source: "Divine", keyAbility: "int",
-    hpBase: 5, surges: 6, defenses: { fort: 0, ref: 1, will: 1 },
+    hpBase: 10, surges: 6, defenses: { fort: 0, ref: 1, will: 1 },
     armor: ["Cloth", "Leather"],
     weapons: ["Simple melee", "Simple ranged", "Military ranged (crossbow)"],
     deity: "Uzotol", trainedSkills: ["Arcana", "History", "Religion", "Thievery"],
@@ -470,7 +470,7 @@ const CLASSES = {
   },
   consecrator: {
     name: "Consecrator of Ugyn", role: "Controller", source: "Divine", keyAbility: "wis",
-    hpBase: 5, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
+    hpBase: 10, surges: 7, defenses: { fort: 1, ref: 0, will: 2 },
     armor: ["Cloth", "Leather", "Hide"],
     weapons: ["Simple melee", "Simple ranged", "Military melee (staff, spear)"],
     deity: "Ugyn", trainedSkills: ["Insight", "Perception", "Religion", "Streetwise"],
@@ -482,7 +482,7 @@ const CLASSES = {
   },
   brightone: {
     name: "Bright One Ritualist", role: "Leader", source: "Divine", keyAbility: "cha",
-    hpBase: 6, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
+    hpBase: 12, surges: 6, defenses: { fort: 0, ref: 1, will: 2 },
     armor: ["Cloth", "Leather"],
     weapons: ["Simple melee", "Simple ranged"],
     deity: "Twin Bright Ones", trainedSkills: ["Diplomacy", "History", "Insight", "Religion"],
@@ -760,12 +760,17 @@ const LEVEL_PROGRESS = [
 
 // STATE
 let selectedSpecies=null, selectedSecondary=null, selectedClass=null;
+let selectedArmor=null;
 let selectedFeats=[], selectedSkills=[];
 let selectedPowers={atwill:[],encounter:null,utility:null,daily:null};
 let abilityScores={};
 let scoreMethod="array";
 const PT_TOTAL=28, PT_MIN=8, PT_MAX=18;
 const PT_COST={8:0,9:1,10:2,11:3,12:4,13:5,14:6,15:8,16:10,17:13,18:16};
+const ARMOR_BONUS={"Cloth":{bonus:0,maxDex:99},"Leather":{bonus:2,maxDex:99},"Hide":{bonus:3,maxDex:99},"Chainmail":{bonus:4,maxDex:1},"Scale":{bonus:7,maxDex:1},"Plate":{bonus:8,maxDex:0}};
+const ARMOR_ORDER=["Cloth","Leather","Hide","Chainmail","Scale","Plate"];
+function getDefaultArmor(cl){const armors=cl.armor.filter(a=>a!=="Shield");for(let i=ARMOR_ORDER.length-1;i>=0;i--){if(armors.includes(ARMOR_ORDER[i]))return ARMOR_ORDER[i]}return "Cloth"}
+function getArmorOptions(cl){return cl.armor.filter(a=>a!=="Shield")}
 
 function mod(s){return Math.floor((s-10)/2)}
 function describeSpeciesAbilityBonuses(sp,sec){const p=ABILITY_LABELS[sp.primaryAbility];const c=sp.secondaryChoices.map(a=>ABILITY_LABELS[a]).join(" or ");let t=`+2 ${p}; choose one +1 ${c}`;if(sec&&sp.secondaryChoices.includes(sec))t+=` — selected +1 ${ABILITY_LABELS[sec]}`;return t}
@@ -800,6 +805,7 @@ function selectClass(key){selectedClass=key;const cl=CLASSES[key];let i=`<strong
   const dm={heartsworn:"Astridhe (Star-Mother)",soulkeeper:"Dyhas (Souls)",oathbound:"Onos (Oaths & Thresholds)",warsinger:"Mithar (War, Dead)",trickweaver:"Pheksus (Trickster)",balancejudge:"Phiznir (Justice & Mercy)",sparkwright:"Uzotol (Creative Invention)",consecrator:"Ugyn (Questions & Consequences)",brightone:"Twin Bright Ones"};
   if(dm[key])document.getElementById("deitySelect").value=dm[key];
   selectedFeats=selectedFeats.filter(id=>featMatches(id));
+  selectedArmor=null;
   renderFeats();renderSkills();selectedPowers={atwill:[],encounter:null,utility:null,daily:null};renderPowers();updateAll()}
 
 function setAbility(ab,val){abilityScores[ab]=parseInt(val)||10;updateAll()}
@@ -818,6 +824,9 @@ function updateAll(){
   updateDerived();updateSheet();
 }
 
+function selectArmor(name){const cl=selectedClass?CLASSES[selectedClass]:null;if(!cl||!getArmorOptions(cl).includes(name))return;selectedArmor=name;updateDerived();updateSheet()}
+function getSelectedArmor(cl){if(selectedArmor&&getArmorOptions(cl).includes(selectedArmor))return selectedArmor;return getDefaultArmor(cl)}
+function computeAC(cl,ds,is){const armorName=getSelectedArmor(cl);const armor=ARMOR_BONUS[armorName];const dexIntMod=Math.max(mod(ds),mod(is));const appliedDex=Math.min(dexIntMod,armor.maxDex);const shield=cl.armor.includes('Shield')?1:0;return 10+armor.bonus+appliedDex+shield}
 function updateDerived(){
   const dg=document.getElementById("derivedGrid");
   if(!selectedClass){dg.innerHTML='<div style="color:#888">Select a class to see derived stats.</div>';return}
@@ -830,8 +839,10 @@ function updateDerived(){
   let fort=10+Math.max(mod(ss),mod(cs))+cl.defenses.fort;
   let ref=10+Math.max(mod(ds),mod(is))+cl.defenses.ref;
   let will=10+Math.max(mod(ws),mod(chs))+cl.defenses.will;
-  let ac=10+cl.defenses.ref+Math.max(mod(ds),mod(is));
-  dg.innerHTML=`<div class="derived-item"><div class="label">Max HP</div><div class="value">${hp}</div></div><div class="derived-item"><div class="label">Bloodied</div><div class="value">${blood}</div></div><div class="derived-item"><div class="label">Healing Surges</div><div class="value">${surges}</div></div><div class="derived-item"><div class="label">Surge Value</div><div class="value">${sv}</div></div><div class="derived-item"><div class="label">AC</div><div class="value">${ac}</div></div><div class="derived-item"><div class="label">Fortitude</div><div class="value">${fort}</div></div><div class="derived-item"><div class="label">Reflex</div><div class="value">${ref}</div></div><div class="derived-item"><div class="label">Will</div><div class="value">${will}</div></div><div class="derived-item"><div class="label">Initiative</div><div class="value">+${mod(ds)}</div></div><div class="derived-item"><div class="label">Speed</div><div class="value">${sp?sp.speed:6}${sp&&sp.specialSpeed?' ('+sp.specialSpeed+')':''}</div></div>`;
+  let ac=computeAC(cl,ds,is);
+  const armorName=getSelectedArmor(cl);
+  const armorSelect=`<div class="derived-item" style="grid-column:1/-1;text-align:left;background:transparent;border:none;padding:0"><label style="color:#888;font-size:.85em">Armor: </label><select id="armorSelect" onchange="selectArmor(this.value)" style="padding:4px 8px;background:#0f1729;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0">${getArmorOptions(cl).map(a=>`<option value="${a}" ${a===armorName?'selected':''}>${a}</option>`).join('')}</select></div>`;
+  dg.innerHTML=armorSelect+`<div class="derived-item"><div class="label">Max HP</div><div class="value">${hp}</div></div><div class="derived-item"><div class="label">Bloodied</div><div class="value">${blood}</div></div><div class="derived-item"><div class="label">Healing Surges</div><div class="value">${surges}</div></div><div class="derived-item"><div class="label">Surge Value</div><div class="value">${sv}</div></div><div class="derived-item"><div class="label">AC</div><div class="value">${ac}</div></div><div class="derived-item"><div class="label">Fortitude</div><div class="value">${fort}</div></div><div class="derived-item"><div class="label">Reflex</div><div class="value">${ref}</div></div><div class="derived-item"><div class="label">Will</div><div class="value">${will}</div></div><div class="derived-item"><div class="label">Initiative</div><div class="value">+${mod(ds)}</div></div><div class="derived-item"><div class="label">Speed</div><div class="value">${sp?sp.speed:6}${sp&&sp.specialSpeed?' ('+sp.specialSpeed+')':''}</div></div>`;
 }
 
 function renderFeats(){
@@ -891,7 +902,7 @@ function updateSheet(){
   let fort=cl?10+Math.max(mod(ss),mod(cs))+cl.defenses.fort:0;
   let ref=cl?10+Math.max(mod(ds),mod(is))+cl.defenses.ref:0;
   let will=cl?10+Math.max(mod(ws),mod(chs))+cl.defenses.will:0;
-  let ac=cl?10+cl.defenses.ref+Math.max(mod(ds),mod(is)):0;
+  let ac=cl?computeAC(cl,ds,is):0;
   let init=mod(ds);
   let speed=sp?sp.speed:6;
   let speedSpec=sp&&sp.specialSpeed?', '+sp.specialSpeed:'';
@@ -925,7 +936,8 @@ function updateSheet(){
   h+='</div>';
   // Defenses
   h+='<div class="sheet-box"><div class="sheet-secthdr">Defenses</div><div class="sheet-def-list">';
-  [{n:'AC',v:ac,s:'DEX/INT'},{n:'FORT',v:fort,s:'STR/CON'},{n:'REF',v:ref,s:'DEX/INT'},{n:'WILL',v:will,s:'WIS/CHA'}].forEach(d=>{h+=`<div class="sheet-def-item"><div class="sheet-def-circle">${cl?d.v:'—'}</div><div class="sheet-def-name">${d.n}</div><div class="sheet-def-src">${d.s}</div></div>`});
+  const acSrc=cl?(getSelectedArmor(cl)+(cl.armor.includes('Shield')?' + Shield':'')):'DEX/INT';
+  [{n:'AC',v:ac,s:acSrc},{n:'FORT',v:fort,s:'STR/CON'},{n:'REF',v:ref,s:'DEX/INT'},{n:'WILL',v:will,s:'WIS/CHA'}].forEach(d=>{h+=`<div class="sheet-def-item"><div class="sheet-def-circle">${cl?d.v:'—'}</div><div class="sheet-def-name">${d.n}</div><div class="sheet-def-src">${d.s}</div></div>`});
   h+='</div></div>';
   // Features and Feats
   let featHtml='';
@@ -933,7 +945,7 @@ function updateSheet(){
   h+=`<div class="sheet-box"><div class="sheet-secthdr">Features and Feats</div><div class="sheet-feat-list">${featHtml}</div></div>`;
   // Equipment
   let eqHtml='';
-  if(cl){eqHtml=`<div><b>Armor:</b> ${cl.armor.join(', ')}</div><div><b>Weapons:</b> ${cl.weapons.join(', ')}</div>`}else{eqHtml='<span class="sheet-empty">—</span>'}
+  if(cl){const armorName=getSelectedArmor(cl);eqHtml=`<div><b>Armor:</b> ${armorName}${cl.armor.includes('Shield')?' + Shield':''}</div><div><b>Weapons:</b> ${cl.weapons.join(', ')}</div>`}else{eqHtml='<span class="sheet-empty">—</span>'}
   h+=`<div class="sheet-box"><div class="sheet-secthdr">Equipment</div><div class="sheet-feat-list">${eqHtml}</div></div>`;
   h+='</div>';
   // MIDDLE COLUMN: Skills
@@ -994,7 +1006,7 @@ function viewSheet(){updateSheet();document.body.classList.add("sheet-preview");
 function closeSheet(){document.body.classList.remove("sheet-preview");document.getElementById("sheetActions").style.display="none"}
 
 function exportJSON(){
-  const data={name:document.getElementById("charName").value,player:document.getElementById("playerName").value,species:selectedSpecies,secondary:selectedSecondary,class:selectedClass,abilityScores,scoreMethod,selectedFeats,selectedSkills,selectedPowers,deity:document.getElementById("deitySelect").value,alignment:document.getElementById("alignSelect").value,gender:document.getElementById("gender").value,height:document.getElementById("height").value,weight:document.getElementById("weight").value};
+  const data={name:document.getElementById("charName").value,player:document.getElementById("playerName").value,species:selectedSpecies,secondary:selectedSecondary,class:selectedClass,armor:selectedArmor,abilityScores,scoreMethod,selectedFeats,selectedSkills,selectedPowers,deity:document.getElementById("deitySelect").value,alignment:document.getElementById("alignSelect").value,gender:document.getElementById("gender").value,height:document.getElementById("height").value,weight:document.getElementById("weight").value};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(data.name||"character")+".json";a.click()
 }
@@ -1009,7 +1021,7 @@ function importJSON(e){
       if(d.player)document.getElementById("playerName").value=d.player;
       if(d.species){selectedSpecies=d.species;document.querySelector(`input[name="species"][value="${d.species}"]`).checked=true;renderSecondaryAbilityChoice()}
       if(d.secondary){selectedSecondary=d.secondary;document.getElementById("secondaryAbilitySelect").value=d.secondary}
-      if(d.class){selectedClass=d.class;document.querySelector(`input[name="class"][value="${d.class}"]`).checked=true;selectClass(d.class)}
+      if(d.class){selectedClass=d.class;document.querySelector(`input[name="class"][value="${d.class}"]`).checked=true;selectClass(d.class);if(d.armor)selectedArmor=d.armor}
       if(d.abilityScores)abilityScores=d.abilityScores;
       if(d.scoreMethod){scoreMethod=d.scoreMethod;document.querySelector(`input[name="scoreMethod"][value="${d.scoreMethod}"]`).checked=true;renderAbilityInputs()}
       if(d.selectedFeats)selectedFeats=d.selectedFeats;
@@ -1027,7 +1039,7 @@ function importJSON(e){
 }
 
 function resetAll(){
-  selectedSpecies=null;selectedSecondary=null;selectedClass=null;selectedFeats=[];selectedSkills=[];
+  selectedSpecies=null;selectedSecondary=null;selectedClass=null;selectedArmor=null;selectedFeats=[];selectedSkills=[];
   selectedPowers={atwill:[],encounter:null,utility:null,daily:null};
   ABILITY_NAMES.forEach(a=>{abilityScores[a]=10});
   scoreMethod="array";
