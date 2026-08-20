@@ -1,0 +1,19 @@
+{
+  "name": "Archades Character Creator",
+  "short_name": "Archades",
+  "description": "Character builder and campaign companion for Archades.",
+  "start_url": "/?mode=phone",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
