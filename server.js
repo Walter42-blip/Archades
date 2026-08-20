@@ -11,6 +11,7 @@ const DATA_FILE = path.join(ROOT, 'dm-data.json');
 const CAMPAIGN_FILE = path.join(ROOT, 'campaign-data.json');
 const SESSION_COOKIE = 'archades_dm_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
+const FIXED_DM_PIN = '4004';
 const sessions = new Map();
 
 let pinRecord = null;
@@ -158,6 +159,13 @@ function loadPinRecord() {
   };
 }
 
+function createFixedPinRecord() {
+  const now = new Date().toISOString();
+  const hashed = hashPin(FIXED_DM_PIN);
+  if (!hashed) throw new Error('Unable to create fixed DM PIN record.');
+  return { ...hashed, createdAt: now, updatedAt: now };
+}
+
 function savePinRecord(record) {
   const payload = JSON.stringify(record, null, 2);
   return fsp.writeFile(AUTH_FILE, payload + '\n', 'utf8');
@@ -303,7 +311,7 @@ async function handleApi(req, res, pathname) {
     if (req.method === 'GET') {
       const record = getCampaignRecord(code);
       if (!record) {
-        sendJson(res, 404, { error: 'Campaign not found.' });
+        sendJson(res, 200, { missing: true, joinCode: code });
         return;
       }
       sendJson(res, 200, record);
@@ -439,6 +447,10 @@ async function handler(req, res) {
 }
 
 pinRecord = loadPinRecord();
+if (!verifyPin(FIXED_DM_PIN, pinRecord)) {
+  pinRecord = createFixedPinRecord();
+  void savePinRecord(pinRecord).catch(() => {});
+}
 dmData = loadDmData();
 campaignStore = loadCampaignStore();
 
